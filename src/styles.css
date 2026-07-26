@@ -1,0 +1,248 @@
+
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Poppins', 'Inter', sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-whatsapp: var(--whatsapp);
+  --color-whatsapp-foreground: var(--whatsapp-foreground);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-surface: var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
+
+  --shadow-card: 0 2px 12px -2px oklch(0.2 0.05 264 / 0.08);
+  --shadow-elevated: 0 8px 24px -8px oklch(0.2 0.05 264 / 0.18);
+  --shadow-pill: 0 4px 14px -4px oklch(0.55 0.18 145 / 0.45);
+}
+
+:root {
+  --radius: 0.875rem;
+
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.18 0.04 265);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.04 265);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.04 265);
+
+  /* Brand deep blue */
+  --brand: oklch(0.32 0.12 260);
+  --brand-foreground: oklch(0.99 0 0);
+
+  --primary: oklch(0.22 0.06 265);
+  --primary-foreground: oklch(0.99 0 0);
+
+  --secondary: oklch(0.97 0.01 250);
+  --secondary-foreground: oklch(0.22 0.06 265);
+
+  --muted: oklch(0.97 0.008 250);
+  --muted-foreground: oklch(0.5 0.02 260);
+
+  --accent: oklch(0.96 0.02 250);
+  --accent-foreground: oklch(0.22 0.06 265);
+
+  /* WhatsApp green */
+  --whatsapp: oklch(0.68 0.18 145);
+  --whatsapp-foreground: oklch(1 0 0);
+
+  /* Highlight yellow */
+  --highlight: oklch(0.88 0.16 90);
+  --highlight-foreground: oklch(0.35 0.1 70);
+
+  --surface: oklch(0.985 0.005 250);
+  --surface-foreground: oklch(0.18 0.04 265);
+
+  --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(1 0 0);
+
+  --border: oklch(0.93 0.01 255);
+  --input: oklch(0.95 0.008 255);
+  --ring: oklch(0.32 0.12 260);
+
+  --chart-1: oklch(0.32 0.12 260);
+  --chart-2: oklch(0.68 0.18 145);
+  --chart-3: oklch(0.88 0.16 90);
+  --chart-4: oklch(0.6 0.15 25);
+  --chart-5: oklch(0.5 0.12 200);
+
+  --sidebar: oklch(0.99 0 0);
+  --sidebar-foreground: oklch(0.18 0.04 265);
+  --sidebar-primary: oklch(0.32 0.12 260);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.96 0.01 250);
+  --sidebar-accent-foreground: oklch(0.22 0.06 265);
+  --sidebar-border: oklch(0.93 0.01 255);
+  --sidebar-ring: oklch(0.32 0.12 260);
+}
+
+.dark {
+  --background: oklch(0.15 0.03 265);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.2 0.04 265);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.2 0.04 265);
+  --popover-foreground: oklch(0.98 0 0);
+  --brand: oklch(0.4 0.14 260);
+  --brand-foreground: oklch(0.99 0 0);
+  --primary: oklch(0.95 0.01 255);
+  --primary-foreground: oklch(0.2 0.05 265);
+  --secondary: oklch(0.27 0.04 260);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.27 0.04 260);
+  --muted-foreground: oklch(0.7 0.03 257);
+  --accent: oklch(0.27 0.04 260);
+  --accent-foreground: oklch(0.98 0 0);
+  --whatsapp: oklch(0.7 0.18 145);
+  --whatsapp-foreground: oklch(0.1 0 0);
+  --highlight: oklch(0.85 0.16 90);
+  --highlight-foreground: oklch(0.3 0.1 70);
+  --surface: oklch(0.18 0.03 265);
+  --surface-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.7 0.19 22);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.55 0.03 264);
+  --sidebar: oklch(0.2 0.04 265);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.4 0.14 260);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.27 0.04 260);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.55 0.03 264);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html, body {
+    background-color: var(--color-surface);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, h5 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer utilities {
+  .font-display { font-family: var(--font-display); }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .input {
+    width: 100%;
+    border-radius: 0.5rem;
+    background: var(--background);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    outline: none;
+    transition: box-shadow 0.15s, border-color 0.15s;
+  }
+  .input:focus {
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--brand) 30%, transparent);
+    border-color: var(--brand);
+  }
+
+  /* ===== Splash screen animations ===== */
+  .splash-logo-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .splash-logo {
+    animation: splash-pop 900ms cubic-bezier(0.34, 1.56, 0.64, 1) both,
+      splash-float 2.4s ease-in-out 900ms infinite;
+    transform-origin: 50% 65%;
+  }
+  .splash-pulse {
+    position: absolute;
+    inset: -10%;
+    border-radius: 9999px;
+    background: radial-gradient(closest-side, rgba(255,255,255,0.35), transparent 70%);
+    animation: splash-pulse 1.6s ease-out infinite;
+    pointer-events: none;
+  }
+  .splash-title {
+    animation: splash-fade-up 700ms ease-out 350ms both;
+  }
+  .splash-loader {
+    display: inline-flex;
+    gap: 0.4rem;
+  }
+  .splash-loader span {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.85);
+    animation: splash-bounce 1s ease-in-out infinite;
+  }
+  .splash-loader span:nth-child(2) { animation-delay: 0.15s; }
+  .splash-loader span:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes splash-pop {
+    0%   { opacity: 0; transform: scale(0.4) translateY(20px); }
+    60%  { opacity: 1; transform: scale(1.08) translateY(-4px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes splash-float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-8px) scale(1.02); }
+  }
+  @keyframes splash-pulse {
+    0%   { opacity: 0.55; transform: scale(0.9); }
+    100% { opacity: 0;    transform: scale(1.4); }
+  }
+  @keyframes splash-fade-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes splash-bounce {
+    0%, 100% { transform: translateY(0); opacity: 0.6; }
+    50%      { transform: translateY(-6px); opacity: 1; }
+  }
+}
