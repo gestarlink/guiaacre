@@ -15,10 +15,22 @@ export type Category = {
 };
 
 export const categories: Category[] = [
-  { id: "alimentacao", name: "Alimentação", emoji: "🍔", color: "oklch(0.96 0.04 60)", icon: catAlimentacao },
+  {
+    id: "alimentacao",
+    name: "Alimentação",
+    emoji: "🍔",
+    color: "oklch(0.96 0.04 60)",
+    icon: catAlimentacao,
+  },
   { id: "lojas", name: "Lojas", emoji: "🛍️", color: "oklch(0.96 0.06 100)", icon: catLojas },
   { id: "beleza", name: "Beleza", emoji: "✂️", color: "oklch(0.96 0.03 20)", icon: catBeleza },
-  { id: "servicos", name: "Serviços", emoji: "🔧", color: "oklch(0.95 0.04 230)", icon: catServicos },
+  {
+    id: "servicos",
+    name: "Serviços",
+    emoji: "🔧",
+    color: "oklch(0.95 0.04 230)",
+    icon: catServicos,
+  },
   { id: "saude", name: "Saúde", emoji: "❤️", color: "oklch(0.96 0.04 25)", icon: catSaude },
 ];
 

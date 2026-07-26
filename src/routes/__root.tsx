@@ -32,28 +32,44 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" },
+      {
+        name: "viewport",
+        content:
+          "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no",
+      },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "apple-mobile-web-app-title", content: "GuiaAcre" },
       { name: "theme-color", content: "#1a2a6c" },
       { title: "GuiaAcre — Negócios locais no Acre" },
-      { name: "description", content: "Encontre negócios por bairro no Acre e fale direto pelo WhatsApp." },
+      {
+        name: "description",
+        content: "Encontre negócios por bairro no Acre e fale direto pelo WhatsApp.",
+      },
       { name: "author", content: "GuiaAcre" },
       { property: "og:title", content: "GuiaAcre — Negócios locais no Acre" },
-      { property: "og:description", content: "Encontre negócios por bairro no Acre e fale direto pelo WhatsApp." },
+      {
+        property: "og:description",
+        content: "Encontre negócios por bairro no Acre e fale direto pelo WhatsApp.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "GuiaAcre — Negócios locais no Acre" },
-      { name: "twitter:description", content: "Encontre negócios por bairro no Acre e fale direto pelo WhatsApp." },
+      {
+        name: "twitter:description",
+        content: "Encontre negócios por bairro no Acre e fale direto pelo WhatsApp.",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap",
+      },
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16.png" },
       { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32.png" },

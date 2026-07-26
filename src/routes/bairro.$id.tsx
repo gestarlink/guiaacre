@@ -32,7 +32,9 @@ function NeighborhoodPage() {
       <MobileShell>
         <div className="p-8 text-center">
           <p>Bairro não encontrado.</p>
-          <Link to="/" className="text-brand underline">Voltar</Link>
+          <Link to="/" className="text-brand underline">
+            Voltar
+          </Link>
         </div>
       </MobileShell>
     );

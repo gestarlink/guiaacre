@@ -3,7 +3,9 @@ import { jwtVerify } from "jose";
 import { queryOne } from "./db.server";
 import type { AuthUser } from "./auth.server";
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "dev-secret-change-in-production");
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || "dev-secret-change-in-production",
+);
 
 export function setTokenCookie(token: string) {
   setCookie("guiaacre_token", token, {
@@ -30,7 +32,8 @@ export async function getUserFromToken(token: string): Promise<AuthUser | null> 
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
     return queryOne<AuthUser>(
-      "SELECT id, email, name, role, avatar_url FROM users WHERE id = ?", payload.sub as string,
+      "SELECT id, email, name, role, avatar_url FROM users WHERE id = ?",
+      payload.sub as string,
     );
   } catch {
     return null;

@@ -39,16 +39,15 @@ export function DesktopShell({ children }: { children: ReactNode }) {
             <img src={logo} alt="GuiaAcre" className="h-10 w-10" draggable={false} />
             <div className="leading-tight">
               <p className="font-display font-bold text-xl">GuiaAcre</p>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Marketplace Acreano</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Marketplace Acreano
+              </p>
             </div>
           </Link>
 
           <nav className="flex items-center gap-1">
             {navLinks.map((link) => {
-              const active =
-                link.to === "/"
-                  ? pathname === "/"
-                  : pathname.startsWith(link.to);
+              const active = link.to === "/" ? pathname === "/" : pathname.startsWith(link.to);
               return (
                 <Link
                   key={link.to}
@@ -113,30 +112,56 @@ export function DesktopShell({ children }: { children: ReactNode }) {
               <p className="font-display font-bold text-xl">GuiaAcre</p>
             </div>
             <p className="text-sm opacity-70 mt-4 leading-relaxed">
-              O marketplace que conecta você aos melhores negócios, serviços e profissionais
-              do Acre. Tudo em um só lugar.
+              O marketplace que conecta você aos melhores negócios, serviços e profissionais do
+              Acre. Tudo em um só lugar.
             </p>
           </div>
           <div>
             <h4 className="font-display font-semibold mb-3">Explorar</h4>
             <ul className="space-y-2 text-sm opacity-80">
-              <li><Link to="/buscar" className="hover:opacity-100">Todos os negócios</Link></li>
-              <li><Link to="/bairros" className="hover:opacity-100">Bairros</Link></li>
-              <li><Link to="/favoritos" className="hover:opacity-100">Favoritos</Link></li>
+              <li>
+                <Link to="/buscar" className="hover:opacity-100">
+                  Todos os negócios
+                </Link>
+              </li>
+              <li>
+                <Link to="/bairros" className="hover:opacity-100">
+                  Bairros
+                </Link>
+              </li>
+              <li>
+                <Link to="/favoritos" className="hover:opacity-100">
+                  Favoritos
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
             <h4 className="font-display font-semibold mb-3">Para empresas</h4>
             <ul className="space-y-2 text-sm opacity-80">
-              <li><Link to="/cadastrar" className="hover:opacity-100">Cadastre seu negócio</Link></li>
-              <li><Link to="/meus-negocios" className="hover:opacity-100">Meus negócios</Link></li>
-              <li><Link to="/auth" className="hover:opacity-100">Acessar minha conta</Link></li>
+              <li>
+                <Link to="/cadastrar" className="hover:opacity-100">
+                  Cadastre seu negócio
+                </Link>
+              </li>
+              <li>
+                <Link to="/meus-negocios" className="hover:opacity-100">
+                  Meus negócios
+                </Link>
+              </li>
+              <li>
+                <Link to="/auth" className="hover:opacity-100">
+                  Acessar minha conta
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
             <h4 className="font-display font-semibold mb-3">Contato</h4>
             <ul className="space-y-2 text-sm opacity-80">
-              <li className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Rio Branco, AC</li>
+              <li className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" /> Rio Branco, AC
+              </li>
               <li>contato@guiaacre.com</li>
             </ul>
           </div>

@@ -67,15 +67,25 @@ function slugify(s: string): string {
 }
 
 const CITY_SLUGS: Record<string, string> = {
-  "rio branco": "rio-branco", "cruzeiro do sul": "cruzeiro-do-sul",
-  "sena madureira": "sena-madureira", "senador guiomard": "senador-guiomard",
-  bujari: "bujari", brasileia: "brasileia", "brasiléia": "brasileia",
-  epitaciolândia: "epitaciolandia", epitaciolandia: "epitaciolandia",
-  tarauacá: "tarauaca", tarauaca: "tarauaca",
-  feijó: "feijo", feijo: "feijo",
+  "rio branco": "rio-branco",
+  "cruzeiro do sul": "cruzeiro-do-sul",
+  "sena madureira": "sena-madureira",
+  "senador guiomard": "senador-guiomard",
+  bujari: "bujari",
+  brasileia: "brasileia",
+  brasiléia: "brasileia",
+  epitaciolândia: "epitaciolandia",
+  epitaciolandia: "epitaciolandia",
+  tarauacá: "tarauaca",
+  tarauaca: "tarauaca",
+  feijó: "feijo",
+  feijo: "feijo",
 };
 
-function detectCity(address: string | undefined, components: PlaceDetails["addressComponents"] | undefined) {
+function detectCity(
+  address: string | undefined,
+  components: PlaceDetails["addressComponents"] | undefined,
+) {
   let cityName: string | undefined;
   if (components) {
     const c = components.find(
@@ -94,27 +104,59 @@ function detectCity(address: string | undefined, components: PlaceDetails["addre
 }
 
 const TYPE_TO_CATEGORY: Record<string, string> = {
-  restaurant: "alimentacao", cafe: "alimentacao", bakery: "alimentacao",
-  bar: "alimentacao", meal_takeaway: "alimentacao", meal_delivery: "alimentacao",
-  food: "alimentacao", store: "lojas", clothing_store: "lojas",
-  shoe_store: "lojas", furniture_store: "lojas", electronics_store: "lojas",
-  shopping_mall: "lojas", supermarket: "lojas", beauty_salon: "beleza",
-  hair_care: "beleza", barber_shop: "beleza", spa: "beleza",
-  nail_salon: "beleza", gym: "servicos", car_repair: "servicos",
-  lodging: "servicos", hotel: "servicos", travel_agency: "servicos",
-  laundry: "servicos", hospital: "saude", doctor: "saude",
-  dentist: "saude", pharmacy: "saude", physiotherapist: "saude",
+  restaurant: "alimentacao",
+  cafe: "alimentacao",
+  bakery: "alimentacao",
+  bar: "alimentacao",
+  meal_takeaway: "alimentacao",
+  meal_delivery: "alimentacao",
+  food: "alimentacao",
+  store: "lojas",
+  clothing_store: "lojas",
+  shoe_store: "lojas",
+  furniture_store: "lojas",
+  electronics_store: "lojas",
+  shopping_mall: "lojas",
+  supermarket: "lojas",
+  beauty_salon: "beleza",
+  hair_care: "beleza",
+  barber_shop: "beleza",
+  spa: "beleza",
+  nail_salon: "beleza",
+  gym: "servicos",
+  car_repair: "servicos",
+  lodging: "servicos",
+  hotel: "servicos",
+  travel_agency: "servicos",
+  laundry: "servicos",
+  hospital: "saude",
+  doctor: "saude",
+  dentist: "saude",
+  pharmacy: "saude",
+  physiotherapist: "saude",
   veterinary_care: "saude",
 };
 
 function detectCategorySlug(types: string[] = [], primary?: string): string {
   if (primary && TYPE_TO_CATEGORY[primary]) return TYPE_TO_CATEGORY[primary];
-  for (const t of types) { if (TYPE_TO_CATEGORY[t]) return TYPE_TO_CATEGORY[t]; }
+  for (const t of types) {
+    if (TYPE_TO_CATEGORY[t]) return TYPE_TO_CATEGORY[t];
+  }
   return "servicos";
 }
 
 function categoryLabel(slug: string): string {
-  return ({ alimentacao: "Alimentação", lojas: "Lojas", beleza: "Beleza", servicos: "Serviços", saude: "Saúde" } as Record<string, string>)[slug] || "Serviços";
+  return (
+    (
+      {
+        alimentacao: "Alimentação",
+        lojas: "Lojas",
+        beleza: "Beleza",
+        servicos: "Serviços",
+        saude: "Saúde",
+      } as Record<string, string>
+    )[slug] || "Serviços"
+  );
 }
 
 function extractWhatsapp(phone?: string): string | undefined {
@@ -142,23 +184,36 @@ async function photoMediaUrl(photoName: string, max = 1600): Promise<string | nu
 }
 
 const SEARCH_MASK = [
-  "places.id", "places.displayName", "places.formattedAddress", "places.types",
-  "places.primaryType", "places.rating", "places.userRatingCount",
-  "places.photos.name", "places.location", "places.editorialSummary", "nextPageToken",
+  "places.id",
+  "places.displayName",
+  "places.formattedAddress",
+  "places.types",
+  "places.primaryType",
+  "places.rating",
+  "places.userRatingCount",
+  "places.photos.name",
+  "places.location",
+  "places.editorialSummary",
+  "nextPageToken",
 ].join(",");
 
 export const searchPlaces = createServerFn({ method: "POST" })
   .validator((d: { query: string; city?: string }) => d)
   .handler(async ({ data }) => {
     await requireAdmin();
-    const fullQuery = data.city ? `${data.query} em ${data.city}, Acre` : `${data.query}, Acre, Brasil`;
+    const fullQuery = data.city
+      ? `${data.query} em ${data.city}, Acre`
+      : `${data.query}, Acre, Brasil`;
 
     const res = await fetch(`${GMAPS_API}/places:searchText`, {
       method: "POST",
       headers: gmapsHeaders(SEARCH_MASK),
       body: JSON.stringify({
-        textQuery: fullQuery, languageCode: "pt-BR", regionCode: "BR",
-        locationBias: ACRE_BIAS, maxResultCount: 20,
+        textQuery: fullQuery,
+        languageCode: "pt-BR",
+        regionCode: "BR",
+        locationBias: ACRE_BIAS,
+        maxResultCount: 20,
       }),
     });
     if (!res.ok) {
@@ -171,7 +226,9 @@ export const searchPlaces = createServerFn({ method: "POST" })
     const placeIds = rawPlaces.map((p) => p.id).filter(Boolean);
     const existing = placeIds.length
       ? await query<{ id: string; place_id: string; slug: string | null }>(
-          "SELECT id, place_id, slug FROM businesses WHERE place_id IN (" + placeIds.map(() => "?").join(",") + ")",
+          "SELECT id, place_id, slug FROM businesses WHERE place_id IN (" +
+            placeIds.map(() => "?").join(",") +
+            ")",
           ...placeIds,
         )
       : [];
@@ -184,10 +241,15 @@ export const searchPlaces = createServerFn({ method: "POST" })
         return {
           placeId: p.id,
           name: p.displayName?.text || p.displayName || "Sem nome",
-          formattedAddress: p.formattedAddress, primaryType: p.primaryType,
-          types: p.types, rating: p.rating, ratingCount: p.userRatingCount,
+          formattedAddress: p.formattedAddress,
+          primaryType: p.primaryType,
+          types: p.types,
+          rating: p.rating,
+          ratingCount: p.userRatingCount,
           photoUrl: photoUrl || undefined,
-          location: p.location ? { lat: p.location.latitude, lng: p.location.longitude } : undefined,
+          location: p.location
+            ? { lat: p.location.latitude, lng: p.location.longitude }
+            : undefined,
           shortDescription: p.editorialSummary?.text,
           alreadyImported: existingMap.get(p.id) || null,
         };
@@ -197,10 +259,23 @@ export const searchPlaces = createServerFn({ method: "POST" })
   });
 
 const DETAILS_MASK = [
-  "id", "displayName", "formattedAddress", "addressComponents", "types", "primaryType",
-  "rating", "userRatingCount", "internationalPhoneNumber", "nationalPhoneNumber",
-  "websiteUri", "googleMapsUri", "regularOpeningHours", "editorialSummary",
-  "reviews", "photos", "location",
+  "id",
+  "displayName",
+  "formattedAddress",
+  "addressComponents",
+  "types",
+  "primaryType",
+  "rating",
+  "userRatingCount",
+  "internationalPhoneNumber",
+  "nationalPhoneNumber",
+  "websiteUri",
+  "googleMapsUri",
+  "regularOpeningHours",
+  "editorialSummary",
+  "reviews",
+  "photos",
+  "location",
 ].join(",");
 
 export const getPlaceDetails = createServerFn({ method: "POST" })
@@ -217,15 +292,27 @@ export const getPlaceDetails = createServerFn({ method: "POST" })
     }
     const p = await res.json();
     const photos: any[] = p.photos || [];
-    const photoUrls = (await Promise.all(photos.slice(0, 8).map((ph) => photoMediaUrl(ph.name, 1200)))).filter((x): x is string => !!x);
+    const photoUrls = (
+      await Promise.all(photos.slice(0, 8).map((ph) => photoMediaUrl(ph.name, 1200)))
+    ).filter((x): x is string => !!x);
     return {
-      placeId: p.id, name: p.displayName?.text || p.displayName || "Sem nome",
-      formattedAddress: p.formattedAddress, addressComponents: p.addressComponents,
-      types: p.types, primaryType: p.primaryType, rating: p.rating, ratingCount: p.userRatingCount,
-      internationalPhoneNumber: p.internationalPhoneNumber, nationalPhoneNumber: p.nationalPhoneNumber,
-      websiteUri: p.websiteUri, googleMapsUri: p.googleMapsUri,
-      regularOpeningHours: p.regularOpeningHours, editorialSummary: p.editorialSummary,
-      reviews: p.reviews, photos, photoUrls,
+      placeId: p.id,
+      name: p.displayName?.text || p.displayName || "Sem nome",
+      formattedAddress: p.formattedAddress,
+      addressComponents: p.addressComponents,
+      types: p.types,
+      primaryType: p.primaryType,
+      rating: p.rating,
+      ratingCount: p.userRatingCount,
+      internationalPhoneNumber: p.internationalPhoneNumber,
+      nationalPhoneNumber: p.nationalPhoneNumber,
+      websiteUri: p.websiteUri,
+      googleMapsUri: p.googleMapsUri,
+      regularOpeningHours: p.regularOpeningHours,
+      editorialSummary: p.editorialSummary,
+      reviews: p.reviews,
+      photos,
+      photoUrls,
       location: p.location ? { lat: p.location.latitude, lng: p.location.longitude } : undefined,
       shortDescription: p.editorialSummary?.text,
     };
@@ -239,14 +326,18 @@ export const importPlace = createServerFn({ method: "POST" })
 
     if (!data.force) {
       const existing = await queryOne<{ id: string; slug: string | null }>(
-        "SELECT id, slug FROM businesses WHERE place_id = ?", data.placeId,
+        "SELECT id, slug FROM businesses WHERE place_id = ?",
+        data.placeId,
       );
       if (existing) {
         return { ok: false, duplicate: true, businessId: existing.id, slug: existing.slug };
       }
     }
 
-    const { name: cityName, slug: citySlug } = detectCity(details.formattedAddress, details.addressComponents);
+    const { name: cityName, slug: citySlug } = detectCity(
+      details.formattedAddress,
+      details.addressComponents,
+    );
     const categorySlug = detectCategorySlug(details.types, details.primaryType);
     const categoryName = categoryLabel(categorySlug);
 
@@ -258,7 +349,9 @@ export const importPlace = createServerFn({ method: "POST" })
       slug = `${base}-${Math.floor(Math.random() * 1000)}`;
     }
 
-    const whatsapp = extractWhatsapp(details.internationalPhoneNumber || details.nationalPhoneNumber);
+    const whatsapp = extractWhatsapp(
+      details.internationalPhoneNumber || details.nationalPhoneNumber,
+    );
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
     const photoUrls = details.photoUrls || [];
@@ -266,17 +359,34 @@ export const importPlace = createServerFn({ method: "POST" })
     await execute(
       `INSERT INTO businesses (id, name, slug, category, category_id, city, city_id, address, description, tags, hours, opening_hours, whatsapp, phone, website, instagram, latitude, longitude, rating, rating_count, place_id, image_url, gallery, source, status, owner_id, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      id, details.name, slug, categoryName, categorySlug, cityName, citySlug,
-      details.formattedAddress || null, details.editorialSummary?.text || null,
+      id,
+      details.name,
+      slug,
+      categoryName,
+      categorySlug,
+      cityName,
+      citySlug,
+      details.formattedAddress || null,
+      details.editorialSummary?.text || null,
       JSON.stringify([]),
       details.regularOpeningHours?.weekdayDescriptions?.join("\n") || null,
       JSON.stringify(details.regularOpeningHours || null),
-      whatsapp || null, details.internationalPhoneNumber || details.nationalPhoneNumber || null,
-      details.websiteUri || null, instagramHandle(details.websiteUri),
-      details.location?.lat ?? null, details.location?.lng ?? null,
-      details.rating ?? null, details.ratingCount ?? null, details.placeId,
-      photoUrls[0] || null, JSON.stringify(photoUrls),
-      "google_places", "approved", "00000000-0000-0000-0000-000000000000", now, now,
+      whatsapp || null,
+      details.internationalPhoneNumber || details.nationalPhoneNumber || null,
+      details.websiteUri || null,
+      instagramHandle(details.websiteUri),
+      details.location?.lat ?? null,
+      details.location?.lng ?? null,
+      details.rating ?? null,
+      details.ratingCount ?? null,
+      details.placeId,
+      photoUrls[0] || null,
+      JSON.stringify(photoUrls),
+      "google_places",
+      "approved",
+      "00000000-0000-0000-0000-000000000000",
+      now,
+      now,
     );
 
     return { ok: true, businessId: id, slug };

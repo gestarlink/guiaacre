@@ -11,7 +11,11 @@ export function PhotoUpload({ value, onChange, className }: Props) {
     <div className={className}>
       {value ? (
         <div className="relative">
-          <img src={value} alt="Foto" className="w-full h-44 object-cover rounded-xl border border-border" />
+          <img
+            src={value}
+            alt="Foto"
+            className="w-full h-44 object-cover rounded-xl border border-border"
+          />
           <button
             type="button"
             onClick={() => onChange(null)}

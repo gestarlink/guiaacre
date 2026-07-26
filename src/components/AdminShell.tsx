@@ -112,10 +112,7 @@ export function AdminShell({
       {/* Mobile drawer */}
       {open && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setOpen(false)}
-          />
+          <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
           <aside className="relative w-72 max-w-[80vw] bg-card flex flex-col shadow-xl">
             <div className="px-5 py-4 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -125,7 +122,10 @@ export function AdminShell({
                   <p className="text-xs text-muted-foreground mt-0.5">Painel Admin</p>
                 </div>
               </div>
-              <button onClick={() => setOpen(false)} className="h-9 w-9 inline-flex items-center justify-center rounded-lg hover:bg-muted">
+              <button
+                onClick={() => setOpen(false)}
+                className="h-9 w-9 inline-flex items-center justify-center rounded-lg hover:bg-muted"
+              >
                 <X className="h-5 w-5" />
               </button>
             </div>

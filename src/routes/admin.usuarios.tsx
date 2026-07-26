@@ -115,7 +115,11 @@ function AdminUsuariosPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         {r.avatar_url ? (
-                          <img src={r.avatar_url} alt="" className="h-9 w-9 rounded-full object-cover" />
+                          <img
+                            src={r.avatar_url}
+                            alt=""
+                            className="h-9 w-9 rounded-full object-cover"
+                          />
                         ) : (
                           <div className="h-9 w-9 rounded-full bg-muted inline-flex items-center justify-center">
                             <UserIcon className="h-4 w-4 text-muted-foreground" />

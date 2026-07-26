@@ -49,7 +49,12 @@ export function FeaturedCard({ b, fullWidth = false }: { b: DBBusiness; fullWidt
     >
       <div className="relative h-32 w-full overflow-hidden">
         {b.image_url && (
-          <img src={b.image_url} alt={b.name} loading="lazy" className="h-full w-full object-cover" />
+          <img
+            src={b.image_url}
+            alt={b.name}
+            loading="lazy"
+            className="h-full w-full object-cover"
+          />
         )}
         <FavButton id={b.id} floating />
       </div>

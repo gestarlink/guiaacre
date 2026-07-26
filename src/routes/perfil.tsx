@@ -1,15 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import {
-  User,
-  Plus,
-  Settings,
-  HelpCircle,
-  LogOut,
-  ChevronRight,
-  Store,
-  LogIn,
-} from "lucide-react";
+import { User, Plus, Settings, HelpCircle, LogOut, ChevronRight, Store, LogIn } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
@@ -33,8 +24,7 @@ function ProfilePage() {
   const displayName = profile?.display_name || user?.email?.split("@")[0] || "Visitante";
   const firstApproved = myBusinesses.find((b) => b.status === "approved");
   const businessLabel =
-    firstApproved?.name ||
-    (myBusinesses[0]?.name ? `${myBusinesses[0].name} (aguardando)` : null);
+    firstApproved?.name || (myBusinesses[0]?.name ? `${myBusinesses[0].name} (aguardando)` : null);
 
   return (
     <MobileShell>
@@ -42,7 +32,11 @@ function ProfilePage() {
         <div className="flex items-center gap-4">
           <div className="h-16 w-16 rounded-full bg-white/15 flex items-center justify-center overflow-hidden">
             {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt={displayName} className="h-full w-full object-cover" />
+              <img
+                src={profile.avatar_url}
+                alt={displayName}
+                className="h-full w-full object-cover"
+              />
             ) : (
               <User className="h-8 w-8" />
             )}
@@ -56,9 +50,7 @@ function ProfilePage() {
                     <Store className="h-3.5 w-3.5" /> {businessLabel}
                   </p>
                 )}
-                <p className="text-xs opacity-70 mt-0.5">
-                  {profile?.phone || user.email}
-                </p>
+                <p className="text-xs opacity-70 mt-0.5">{profile?.phone || user.email}</p>
               </>
             ) : (
               <p className="text-sm opacity-80">Faça login para gerenciar seus negócios</p>
@@ -100,7 +92,11 @@ function ProfilePage() {
 
         <div className="rounded-2xl bg-card border border-border/60 shadow-card divide-y divide-border overflow-hidden">
           {user && (
-            <ItemLink to="/meus-negocios" icon={<Store className="h-5 w-5" />} label="Meus negócios" />
+            <ItemLink
+              to="/meus-negocios"
+              icon={<Store className="h-5 w-5" />}
+              label="Meus negócios"
+            />
           )}
           <Item icon={<Settings className="h-5 w-5" />} label="Configurações" />
           <Item icon={<HelpCircle className="h-5 w-5" />} label="Ajuda" />

@@ -144,7 +144,10 @@ function DescobertaPage() {
       subtitle="Busque no Google e importe empresas reais para o GuiaAcre com um clique."
     >
       <Card className="p-4 mb-6">
-        <form onSubmit={handleSearch} className="grid gap-3 md:grid-cols-[1fr_220px_auto] items-end">
+        <form
+          onSubmit={handleSearch}
+          className="grid gap-3 md:grid-cols-[1fr_220px_auto] items-end"
+        >
           <div>
             <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
               O que buscar
@@ -157,9 +160,7 @@ function DescobertaPage() {
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
-              Cidade
-            </label>
+            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Cidade</label>
             <Select value={city} onValueChange={setCity}>
               <SelectTrigger>
                 <SelectValue placeholder="Qualquer cidade" />
@@ -174,13 +175,17 @@ function DescobertaPage() {
             </Select>
           </div>
           <Button type="submit" disabled={loading || !query.trim()} size="lg">
-            {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
+            {loading ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Search className="h-4 w-4 mr-2" />
+            )}
             Buscar no Google
           </Button>
         </form>
         <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1.5">
-          <Sparkles className="h-3.5 w-3.5" />
-          A IA escreve a descrição, baixa fotos, detecta categoria e publica a página automaticamente.
+          <Sparkles className="h-3.5 w-3.5" />A IA escreve a descrição, baixa fotos, detecta
+          categoria e publica a página automaticamente.
         </p>
       </Card>
 
@@ -229,11 +234,11 @@ function DescobertaPage() {
                       <div className="flex items-center gap-1 text-xs mt-1">
                         <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
                         <span className="font-medium">{p.rating.toFixed(1)}</span>
-                        <span className="text-muted-foreground">
-                          ({p.ratingCount ?? 0})
-                        </span>
+                        <span className="text-muted-foreground">({p.ratingCount ?? 0})</span>
                         {p.primaryType && (
-                          <span className="text-muted-foreground ml-1">· {p.primaryType.replace(/_/g, " ")}</span>
+                          <span className="text-muted-foreground ml-1">
+                            · {p.primaryType.replace(/_/g, " ")}
+                          </span>
                         )}
                       </div>
                     )}
@@ -245,7 +250,9 @@ function DescobertaPage() {
                     </p>
                   )}
                   {p.shortDescription && (
-                    <p className="text-xs text-muted-foreground line-clamp-2">{p.shortDescription}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {p.shortDescription}
+                    </p>
                   )}
                   <div className="mt-auto pt-3 flex gap-2">
                     <Button
@@ -303,7 +310,9 @@ function DescobertaPage() {
         <div className="text-center py-16 text-muted-foreground border-2 border-dashed border-border rounded-xl">
           <Sparkles className="h-10 w-10 mx-auto mb-3 opacity-40" />
           <p className="font-medium">Pesquise para começar</p>
-          <p className="text-sm mt-1">Ex.: "restaurantes em Rio Branco", "academias", "barbearias em Cruzeiro do Sul"</p>
+          <p className="text-sm mt-1">
+            Ex.: "restaurantes em Rio Branco", "academias", "barbearias em Cruzeiro do Sul"
+          </p>
         </div>
       )}
 
@@ -323,7 +332,13 @@ function DescobertaPage() {
               {detail.photoUrls && detail.photoUrls.length > 0 && (
                 <div className="grid grid-cols-3 gap-2">
                   {detail.photoUrls.map((u, i) => (
-                    <img key={i} src={u} alt="" className="aspect-square object-cover rounded-md" loading="lazy" />
+                    <img
+                      key={i}
+                      src={u}
+                      alt=""
+                      className="aspect-square object-cover rounded-md"
+                      loading="lazy"
+                    />
                   ))}
                 </div>
               )}
@@ -331,11 +346,17 @@ function DescobertaPage() {
                 <div className="flex items-center gap-2 text-sm">
                   <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
                   <strong>{detail.rating.toFixed(1)}</strong>
-                  <span className="text-muted-foreground">({detail.ratingCount ?? 0} avaliações)</span>
+                  <span className="text-muted-foreground">
+                    ({detail.ratingCount ?? 0} avaliações)
+                  </span>
                 </div>
               )}
               {detail.formattedAddress && (
-                <Row icon={<MapPin className="h-4 w-4" />} label="Endereço" value={detail.formattedAddress} />
+                <Row
+                  icon={<MapPin className="h-4 w-4" />}
+                  label="Endereço"
+                  value={detail.formattedAddress}
+                />
               )}
               {(detail.internationalPhoneNumber || detail.nationalPhoneNumber) && (
                 <Row
@@ -345,11 +366,18 @@ function DescobertaPage() {
                 />
               )}
               {detail.websiteUri && (
-                <Row icon={<Globe className="h-4 w-4" />} label="Site" value={detail.websiteUri} link />
+                <Row
+                  icon={<Globe className="h-4 w-4" />}
+                  label="Site"
+                  value={detail.websiteUri}
+                  link
+                />
               )}
               {detail.regularOpeningHours?.weekdayDescriptions && (
                 <div>
-                  <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">Horários</p>
+                  <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">
+                    Horários
+                  </p>
                   <ul className="text-sm space-y-0.5">
                     {detail.regularOpeningHours.weekdayDescriptions.map((d, i) => (
                       <li key={i}>{d}</li>
@@ -359,13 +387,17 @@ function DescobertaPage() {
               )}
               {detail.editorialSummary?.text && (
                 <div>
-                  <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">Resumo</p>
+                  <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">
+                    Resumo
+                  </p>
                   <p className="text-sm">{detail.editorialSummary.text}</p>
                 </div>
               )}
               {detail.reviews && detail.reviews.length > 0 && (
                 <div>
-                  <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">Avaliações</p>
+                  <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">
+                    Avaliações
+                  </p>
                   <div className="space-y-2">
                     {detail.reviews.slice(0, 3).map((r, i) => (
                       <div key={i} className="text-sm border-l-2 border-border pl-3">
@@ -402,14 +434,29 @@ function DescobertaPage() {
   );
 }
 
-function Row({ icon, label, value, link }: { icon: React.ReactNode; label: string; value: string; link?: boolean }) {
+function Row({
+  icon,
+  label,
+  value,
+  link,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  link?: boolean;
+}) {
   return (
     <div className="flex items-start gap-2 text-sm">
       <span className="text-muted-foreground mt-0.5">{icon}</span>
       <div className="flex-1">
         <p className="text-xs font-semibold uppercase text-muted-foreground">{label}</p>
         {link ? (
-          <a href={value} target="_blank" rel="noreferrer" className="text-primary underline break-all">
+          <a
+            href={value}
+            target="_blank"
+            rel="noreferrer"
+            className="text-primary underline break-all"
+          >
             {value}
           </a>
         ) : (

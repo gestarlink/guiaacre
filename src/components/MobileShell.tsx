@@ -31,14 +31,18 @@ export function MobileShell({
       </div>
 
       {/* App container: fullscreen no mobile, "phone frame" no desktop */}
-      <div className="
+      <div
+        className="
         relative mx-auto bg-surface
         w-full min-h-[100dvh]
         md:my-8 md:mr-8 md:ml-auto md:w-[420px] md:min-h-0 md:h-[calc(100dvh-4rem)]
         md:rounded-[2.5rem] md:shadow-elevated md:overflow-hidden md:border md:border-border/60
         md:flex md:flex-col
-      ">
-        <div className={`flex-1 overflow-y-auto scrollbar-hide ${showBottomNav ? "pb-24" : "pb-6"}`}>
+      "
+      >
+        <div
+          className={`flex-1 overflow-y-auto scrollbar-hide ${showBottomNav ? "pb-24" : "pb-6"}`}
+        >
           {children}
         </div>
         {showBottomNav ? <BottomNav /> : null}

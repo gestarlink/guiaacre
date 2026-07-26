@@ -39,12 +39,15 @@ function AdminAnalyticsPage() {
     if (isAdmin) load();
   }, [isAdmin, load]);
 
-  const stats = useMemo(() => ({
-    total: businesses.length,
-    approved: businesses.filter((b) => b.status === "approved").length,
-    pending: businesses.filter((b) => b.status === "pending").length,
-    premium: businesses.filter((b) => b.tier === "premium").length,
-  }), [businesses]);
+  const stats = useMemo(
+    () => ({
+      total: businesses.length,
+      approved: businesses.filter((b) => b.status === "approved").length,
+      pending: businesses.filter((b) => b.status === "pending").length,
+      premium: businesses.filter((b) => b.tier === "premium").length,
+    }),
+    [businesses],
+  );
 
   if (loading || !isAdmin) {
     return (

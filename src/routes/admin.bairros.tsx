@@ -110,9 +110,20 @@ function AdminBairrosPage() {
         <div className="rounded-2xl bg-card border border-border p-4 sm:p-5 mb-4 sm:mb-6">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-display font-semibold flex items-center gap-2">
-              {editing ? <><Pencil className="h-4 w-4" /> Editando: {editing.name}</> : <><Plus className="h-4 w-4" /> Novo bairro</>}
+              {editing ? (
+                <>
+                  <Pencil className="h-4 w-4" /> Editando: {editing.name}
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4" /> Novo bairro
+                </>
+              )}
             </h3>
-            <button onClick={reset} className="h-8 w-8 inline-flex items-center justify-center rounded-lg hover:bg-muted">
+            <button
+              onClick={reset}
+              className="h-8 w-8 inline-flex items-center justify-center rounded-lg hover:bg-muted"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -135,7 +146,9 @@ function AdminBairrosPage() {
               />
             </label>
             <label className="block sm:col-span-2">
-              <span className="text-xs font-medium text-muted-foreground">URL da imagem (opcional)</span>
+              <span className="text-xs font-medium text-muted-foreground">
+                URL da imagem (opcional)
+              </span>
               <input
                 value={form.image_url}
                 onChange={(e) => setForm({ ...form, image_url: e.target.value })}
@@ -152,7 +165,10 @@ function AdminBairrosPage() {
             >
               <Save className="h-4 w-4" /> {saving ? "Salvando..." : "Salvar"}
             </button>
-            <button onClick={reset} className="px-4 h-10 rounded-lg bg-muted text-foreground text-sm font-semibold">
+            <button
+              onClick={reset}
+              className="px-4 h-10 rounded-lg bg-muted text-foreground text-sm font-semibold"
+            >
               Cancelar
             </button>
           </div>
@@ -172,9 +188,16 @@ function AdminBairrosPage() {
         ) : (
           <ul className="divide-y divide-border">
             {data.map((n) => (
-              <li key={n.id} className="flex items-center gap-3 p-3 sm:p-4 hover:bg-muted/30 transition">
+              <li
+                key={n.id}
+                className="flex items-center gap-3 p-3 sm:p-4 hover:bg-muted/30 transition"
+              >
                 {n.image_url ? (
-                  <img src={n.image_url} alt={n.name} className="h-12 w-12 rounded-lg object-cover shrink-0" />
+                  <img
+                    src={n.image_url}
+                    alt={n.name}
+                    className="h-12 w-12 rounded-lg object-cover shrink-0"
+                  />
                 ) : (
                   <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
                     <MapPinned className="h-5 w-5 text-muted-foreground" />

@@ -102,8 +102,13 @@ export function MapView({
           attributionControl: false,
           scrollWheelZoom: false,
         }).setView([coords.lat, coords.lng], 16);
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
-        const marker = L.marker([coords.lat, coords.lng], { icon: DefaultIcon, draggable: interactive }).addTo(map);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(
+          map,
+        );
+        const marker = L.marker([coords.lat, coords.lng], {
+          icon: DefaultIcon,
+          draggable: interactive,
+        }).addTo(map);
         if (interactive) {
           map.on("click", (e: { latlng: { lat: number; lng: number } }) => {
             marker.setLatLng(e.latlng);
@@ -142,7 +147,9 @@ export function MapView({
 
   if (loading) {
     return (
-      <div className={`${height} w-full rounded-xl bg-muted flex items-center justify-center text-muted-foreground text-sm`}>
+      <div
+        className={`${height} w-full rounded-xl bg-muted flex items-center justify-center text-muted-foreground text-sm`}
+      >
         <Loader2 className="h-4 w-4 animate-spin mr-2" /> Carregando mapa...
       </div>
     );
@@ -150,7 +157,9 @@ export function MapView({
 
   if (!coords) {
     return (
-      <div className={`${height} w-full rounded-xl bg-muted/60 border border-dashed border-border flex flex-col items-center justify-center text-muted-foreground text-sm gap-1`}>
+      <div
+        className={`${height} w-full rounded-xl bg-muted/60 border border-dashed border-border flex flex-col items-center justify-center text-muted-foreground text-sm gap-1`}
+      >
         <MapPin className="h-5 w-5" />
         {error ?? "Informe um endereço para ver no mapa"}
       </div>
@@ -159,7 +168,10 @@ export function MapView({
 
   return (
     <div className="space-y-2">
-      <div ref={containerRef} className={`${height} w-full rounded-xl overflow-hidden border border-border z-0`} />
+      <div
+        ref={containerRef}
+        className={`${height} w-full rounded-xl overflow-hidden border border-border z-0`}
+      />
       <a
         href={`https://www.google.com/maps?q=${coords.lat},${coords.lng}`}
         target="_blank"

@@ -26,8 +26,7 @@ function SearchPage() {
   const { data } = useBusinesses();
   const list = data.filter(
     (b) =>
-      (!cat || b.category_id === cat) &&
-      (!q || b.name.toLowerCase().includes(q.toLowerCase()))
+      (!cat || b.category_id === cat) && (!q || b.name.toLowerCase().includes(q.toLowerCase())),
   );
 
   return (

@@ -115,7 +115,9 @@ function AddBusinessPage() {
 
       <form onSubmit={onSubmit} className="px-4 space-y-3 pb-6">
         <div>
-          <label className="text-xs font-medium text-muted-foreground mb-1 block">URL da foto (opcional)</label>
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">
+            URL da foto (opcional)
+          </label>
           <input
             value={imageUrl ?? ""}
             onChange={(e) => setImageUrl(e.target.value || null)}

@@ -110,8 +110,7 @@ function AdminCategoriasPage() {
           onClick={startNew}
           className="inline-flex items-center gap-1.5 h-10 px-3 sm:px-4 rounded-lg bg-brand text-brand-foreground text-sm font-semibold"
         >
-          <Plus className="h-4 w-4" />{" "}
-          <span className="hidden sm:inline">Nova categoria</span>
+          <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Nova categoria</span>
         </button>
       }
     >
@@ -160,14 +159,14 @@ function AdminCategoriasPage() {
               <input
                 type="number"
                 value={form.sort_order}
-                onChange={(e) =>
-                  setForm({ ...form, sort_order: Number(e.target.value) })
-                }
+                onChange={(e) => setForm({ ...form, sort_order: Number(e.target.value) })}
                 className="input mt-1"
               />
             </label>
             <label className="block sm:col-span-2">
-              <span className="text-xs font-medium text-muted-foreground">URL do ícone (opcional)</span>
+              <span className="text-xs font-medium text-muted-foreground">
+                URL do ícone (opcional)
+              </span>
               <input
                 value={form.icon}
                 onChange={(e) => setForm({ ...form, icon: e.target.value })}
@@ -197,8 +196,7 @@ function AdminCategoriasPage() {
       <div className="rounded-2xl bg-card border border-border overflow-hidden">
         <div className="px-4 py-3 border-b border-border flex items-center justify-between">
           <p className="text-sm font-semibold text-muted-foreground">
-            {data.length}{" "}
-            {data.length === 1 ? "categoria cadastrada" : "categorias cadastradas"}
+            {data.length} {data.length === 1 ? "categoria cadastrada" : "categorias cadastradas"}
           </p>
         </div>
         {data.length === 0 ? (
@@ -217,11 +215,7 @@ function AdminCategoriasPage() {
                   style={{ background: c.color ?? "var(--muted)" }}
                 >
                   {c.icon_url ? (
-                    <img
-                      src={c.icon_url}
-                      alt={c.name}
-                      className="h-10 w-10 object-contain"
-                    />
+                    <img src={c.icon_url} alt={c.name} className="h-10 w-10 object-contain" />
                   ) : c.emoji ? (
                     c.emoji
                   ) : (

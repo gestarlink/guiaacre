@@ -21,7 +21,7 @@ export function DesktopSearch({ initialCat }: { initialCat?: string }) {
       (!q ||
         b.name.toLowerCase().includes(q.toLowerCase()) ||
         b.category.toLowerCase().includes(q.toLowerCase()) ||
-        b.neighborhood.toLowerCase().includes(q.toLowerCase()))
+        b.neighborhood.toLowerCase().includes(q.toLowerCase())),
   );
 
   const hasFilters = cat || neighborhood || q;
@@ -32,7 +32,10 @@ export function DesktopSearch({ initialCat }: { initialCat?: string }) {
         <div>
           <p className="text-xs uppercase tracking-wider text-brand font-semibold">Explorar</p>
           <h1 className="font-display font-bold text-4xl mt-1">Buscar negócios</h1>
-          <p className="text-muted-foreground mt-2">{list.length} resultado{list.length !== 1 ? "s" : ""} encontrado{list.length !== 1 ? "s" : ""}</p>
+          <p className="text-muted-foreground mt-2">
+            {list.length} resultado{list.length !== 1 ? "s" : ""} encontrado
+            {list.length !== 1 ? "s" : ""}
+          </p>
         </div>
       </div>
 
@@ -85,8 +88,14 @@ export function DesktopSearch({ initialCat }: { initialCat?: string }) {
                       cat === c.id ? "bg-brand text-brand-foreground" : "hover:bg-muted"
                     }`}
                   >
-                    <span>{c.emoji} {c.name}</span>
-                    <span className={`text-xs ${cat === c.id ? "opacity-80" : "text-muted-foreground"}`}>{count}</span>
+                    <span>
+                      {c.emoji} {c.name}
+                    </span>
+                    <span
+                      className={`text-xs ${cat === c.id ? "opacity-80" : "text-muted-foreground"}`}
+                    >
+                      {count}
+                    </span>
                   </button>
                 );
               })}
@@ -115,7 +124,12 @@ export function DesktopSearch({ initialCat }: { initialCat?: string }) {
                       neighborhood === n.id ? "bg-brand text-brand-foreground" : "hover:bg-muted"
                     }`}
                   >
-                    {n.name} <span className={`text-xs ${neighborhood === n.id ? "opacity-80" : "text-muted-foreground"}`}>· {n.city}</span>
+                    {n.name}{" "}
+                    <span
+                      className={`text-xs ${neighborhood === n.id ? "opacity-80" : "text-muted-foreground"}`}
+                    >
+                      · {n.city}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -141,17 +155,27 @@ export function DesktopSearch({ initialCat }: { initialCat?: string }) {
                 >
                   <div className="relative h-44 bg-muted overflow-hidden">
                     {b.image_url ? (
-                      <img src={b.image_url} alt={b.name} className="h-full w-full object-cover group-hover:scale-110 transition duration-500" />
+                      <img
+                        src={b.image_url}
+                        alt={b.name}
+                        className="h-full w-full object-cover group-hover:scale-110 transition duration-500"
+                      />
                     ) : (
-                      <div className="h-full w-full flex items-center justify-center text-muted-foreground text-xs">Sem foto</div>
+                      <div className="h-full w-full flex items-center justify-center text-muted-foreground text-xs">
+                        Sem foto
+                      </div>
                     )}
                     <div className="absolute top-3 left-3">
                       <TierBadge tier={b.tier} />
                     </div>
                   </div>
                   <div className="p-4 space-y-2">
-                    <h3 className="font-display font-semibold text-base leading-tight line-clamp-1">{b.name}</h3>
-                    <p className="text-xs text-muted-foreground">{b.category} · {b.neighborhood}</p>
+                    <h3 className="font-display font-semibold text-base leading-tight line-clamp-1">
+                      {b.name}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      {b.category} · {b.neighborhood}
+                    </p>
                     <div className="flex items-center justify-between pt-2 border-t border-border">
                       <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                         <MapPin className="h-3.5 w-3.5" /> {b.neighborhood}

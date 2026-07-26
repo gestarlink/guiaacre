@@ -31,9 +31,7 @@ export const listBusinesses = createServerFn({ method: "GET" })
 export const getBusiness = createServerFn({ method: "GET" })
   .validator((d: { id: string }) => d)
   .handler(async ({ data }) => {
-    return queryOne<any>(
-      "SELECT * FROM businesses WHERE id = ? OR slug = ?", data.id, data.id,
-    );
+    return queryOne<any>("SELECT * FROM businesses WHERE id = ? OR slug = ?", data.id, data.id);
   });
 
 export const createBusiness = createServerFn({ method: "POST" })
@@ -50,10 +48,7 @@ export const createBusiness = createServerFn({ method: "POST" })
     const keys = Object.keys(data);
     const vals = Object.values(data);
     const placeholders = keys.map(() => "?").join(", ");
-    await execute(
-      `INSERT INTO businesses (${keys.join(", ")}) VALUES (${placeholders})`,
-      ...vals,
-    );
+    await execute(`INSERT INTO businesses (${keys.join(", ")}) VALUES (${placeholders})`, ...vals);
     return { id, slug: data.slug };
   });
 
@@ -88,17 +83,21 @@ export const deleteBusiness = createServerFn({ method: "POST" })
 
 // ---------- Categories ----------
 
-export const listCategories = createServerFn({ method: "GET" })
-  .handler(async () => {
-    return query<any>("SELECT * FROM categories ORDER BY name");
-  });
+export const listCategories = createServerFn({ method: "GET" }).handler(async () => {
+  return query<any>("SELECT * FROM categories ORDER BY name");
+});
 
 export const createCategory = createServerFn({ method: "POST" })
   .validator((d: any) => d)
   .handler(async ({ data }) => {
     await requireAdmin();
-    await execute("INSERT INTO categories (name, slug, description, icon) VALUES (?, ?, ?, ?)",
-      data.name, data.slug, data.description || null, data.icon || null);
+    await execute(
+      "INSERT INTO categories (name, slug, description, icon) VALUES (?, ?, ?, ?)",
+      data.name,
+      data.slug,
+      data.description || null,
+      data.icon || null,
+    );
     return { ok: true };
   });
 
@@ -106,8 +105,14 @@ export const updateCategory = createServerFn({ method: "POST" })
   .validator((d: any) => d)
   .handler(async ({ data }) => {
     await requireAdmin();
-    await execute("UPDATE categories SET name = ?, slug = ?, description = ?, icon = ? WHERE id = ?",
-      data.name, data.slug, data.description || null, data.icon || null, data.id);
+    await execute(
+      "UPDATE categories SET name = ?, slug = ?, description = ?, icon = ? WHERE id = ?",
+      data.name,
+      data.slug,
+      data.description || null,
+      data.icon || null,
+      data.id,
+    );
     return { ok: true };
   });
 
@@ -121,17 +126,20 @@ export const deleteCategory = createServerFn({ method: "POST" })
 
 // ---------- Cities ----------
 
-export const listCities = createServerFn({ method: "GET" })
-  .handler(async () => {
-    return query<any>("SELECT * FROM cities ORDER BY name");
-  });
+export const listCities = createServerFn({ method: "GET" }).handler(async () => {
+  return query<any>("SELECT * FROM cities ORDER BY name");
+});
 
 export const createCity = createServerFn({ method: "POST" })
   .validator((d: any) => d)
   .handler(async ({ data }) => {
     await requireAdmin();
-    await execute("INSERT INTO cities (name, slug, state) VALUES (?, ?, ?)",
-      data.name, data.slug, data.state || "AC");
+    await execute(
+      "INSERT INTO cities (name, slug, state) VALUES (?, ?, ?)",
+      data.name,
+      data.slug,
+      data.state || "AC",
+    );
     return { ok: true };
   });
 
@@ -139,8 +147,13 @@ export const updateCity = createServerFn({ method: "POST" })
   .validator((d: any) => d)
   .handler(async ({ data }) => {
     await requireAdmin();
-    await execute("UPDATE cities SET name = ?, slug = ?, state = ? WHERE id = ?",
-      data.name, data.slug, data.state || "AC", data.id);
+    await execute(
+      "UPDATE cities SET name = ?, slug = ?, state = ? WHERE id = ?",
+      data.name,
+      data.slug,
+      data.state || "AC",
+      data.id,
+    );
     return { ok: true };
   });
 
@@ -159,7 +172,10 @@ export const listNeighborhoods = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     let sql = "SELECT * FROM neighborhoods";
     const params: unknown[] = [];
-    if (data?.cityId) { sql += " WHERE city_id = ?"; params.push(data.cityId); }
+    if (data?.cityId) {
+      sql += " WHERE city_id = ?";
+      params.push(data.cityId);
+    }
     sql += " ORDER BY name";
     return query<any>(sql, ...params);
   });
@@ -168,8 +184,12 @@ export const createNeighborhood = createServerFn({ method: "POST" })
   .validator((d: any) => d)
   .handler(async ({ data }) => {
     await requireAdmin();
-    await execute("INSERT INTO neighborhoods (name, slug, city_id) VALUES (?, ?, ?)",
-      data.name, data.slug, data.city_id);
+    await execute(
+      "INSERT INTO neighborhoods (name, slug, city_id) VALUES (?, ?, ?)",
+      data.name,
+      data.slug,
+      data.city_id,
+    );
     return { ok: true };
   });
 
@@ -177,8 +197,13 @@ export const updateNeighborhood = createServerFn({ method: "POST" })
   .validator((d: any) => d)
   .handler(async ({ data }) => {
     await requireAdmin();
-    await execute("UPDATE neighborhoods SET name = ?, slug = ?, city_id = ? WHERE id = ?",
-      data.name, data.slug, data.city_id, data.id);
+    await execute(
+      "UPDATE neighborhoods SET name = ?, slug = ?, city_id = ? WHERE id = ?",
+      data.name,
+      data.slug,
+      data.city_id,
+      data.id,
+    );
     return { ok: true };
   });
 
@@ -195,9 +220,13 @@ export const deleteNeighborhood = createServerFn({ method: "POST" })
 export const listReviews = createServerFn({ method: "GET" })
   .validator((d?: { businessId?: string }) => d)
   .handler(async ({ data }) => {
-    let sql = "SELECT r.*, u.name as user_name FROM reviews r LEFT JOIN users u ON r.user_id = u.id";
+    let sql =
+      "SELECT r.*, u.name as user_name FROM reviews r LEFT JOIN users u ON r.user_id = u.id";
     const params: unknown[] = [];
-    if (data?.businessId) { sql += " WHERE r.business_id = ?"; params.push(data.businessId); }
+    if (data?.businessId) {
+      sql += " WHERE r.business_id = ?";
+      params.push(data.businessId);
+    }
     sql += " ORDER BY r.created_at DESC";
     return query<any>(sql, ...params);
   });
@@ -210,7 +239,12 @@ export const createReview = createServerFn({ method: "POST" })
     const now = new Date().toISOString();
     await execute(
       "INSERT INTO reviews (id, business_id, user_id, rating, comment, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-      id, data.business_id, user.id, data.rating, data.comment || null, now,
+      id,
+      data.business_id,
+      user.id,
+      data.rating,
+      data.comment || null,
+      now,
     );
     return { ok: true };
   });
@@ -239,15 +273,22 @@ export const toggleFavorite = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const user = await requireUser();
     const existing = await queryOne<{ id: string }>(
-      "SELECT id FROM favorites WHERE user_id = ? AND business_id = ?", user.id, data.business_id,
+      "SELECT id FROM favorites WHERE user_id = ? AND business_id = ?",
+      user.id,
+      data.business_id,
     );
     if (existing) {
       await execute("DELETE FROM favorites WHERE id = ?", existing.id);
       return { favorited: false };
     }
     const id = crypto.randomUUID();
-    await execute("INSERT INTO favorites (id, user_id, business_id, created_at) VALUES (?, ?, ?, ?)",
-      id, user.id, data.business_id, new Date().toISOString());
+    await execute(
+      "INSERT INTO favorites (id, user_id, business_id, created_at) VALUES (?, ?, ?, ?)",
+      id,
+      user.id,
+      data.business_id,
+      new Date().toISOString(),
+    );
     return { favorited: true };
   });
 
@@ -259,18 +300,24 @@ export const createAnalyticsEvent = createServerFn({ method: "POST" })
     const user = await getOptionalUser();
     await execute(
       "INSERT INTO analytics_events (event, business_id, user_id, metadata, created_at) VALUES (?, ?, ?, ?, ?)",
-      data.event, data.business_id || null, user?.id || null, data.metadata || null, new Date().toISOString(),
+      data.event,
+      data.business_id || null,
+      user?.id || null,
+      data.metadata || null,
+      new Date().toISOString(),
     );
     return { ok: true };
   });
 
 // ---------- Profile ----------
 
-export const getProfile = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const user = await requireUser();
-    return queryOne<any>("SELECT id, email, name, avatar_url, role, created_at FROM users WHERE id = ?", user.id);
-  });
+export const getProfile = createServerFn({ method: "GET" }).handler(async () => {
+  const user = await requireUser();
+  return queryOne<any>(
+    "SELECT id, email, name, avatar_url, role, created_at FROM users WHERE id = ?",
+    user.id,
+  );
+});
 
 export const updateProfile = createServerFn({ method: "POST" })
   .validator((d: { name?: string; avatar_url?: string }) => d)
@@ -278,8 +325,14 @@ export const updateProfile = createServerFn({ method: "POST" })
     const user = await requireUser();
     const updates: string[] = [];
     const vals: unknown[] = [];
-    if (data.name !== undefined) { updates.push("name = ?"); vals.push(data.name); }
-    if (data.avatar_url !== undefined) { updates.push("avatar_url = ?"); vals.push(data.avatar_url); }
+    if (data.name !== undefined) {
+      updates.push("name = ?");
+      vals.push(data.name);
+    }
+    if (data.avatar_url !== undefined) {
+      updates.push("avatar_url = ?");
+      vals.push(data.avatar_url);
+    }
     if (updates.length === 0) return { ok: true };
     updates.push("updated_at = ?");
     vals.push(new Date().toISOString());
@@ -290,18 +343,23 @@ export const updateProfile = createServerFn({ method: "POST" })
 
 // ---------- Admin: users ----------
 
-export const listUsers = createServerFn({ method: "GET" })
-  .handler(async () => {
-    await requireAdmin();
-    return query<any>("SELECT id, email, name, avatar_url, role, created_at FROM users ORDER BY created_at DESC");
-  });
+export const listUsers = createServerFn({ method: "GET" }).handler(async () => {
+  await requireAdmin();
+  return query<any>(
+    "SELECT id, email, name, avatar_url, role, created_at FROM users ORDER BY created_at DESC",
+  );
+});
 
 export const updateUserRole = createServerFn({ method: "POST" })
   .validator((d: { id: string; role: string }) => d)
   .handler(async ({ data }) => {
     await requireAdmin();
-    await execute("UPDATE users SET role = ?, updated_at = ? WHERE id = ?",
-      data.role, new Date().toISOString(), data.id);
+    await execute(
+      "UPDATE users SET role = ?, updated_at = ? WHERE id = ?",
+      data.role,
+      new Date().toISOString(),
+      data.id,
+    );
     return { ok: true };
   });
 

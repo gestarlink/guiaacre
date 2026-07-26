@@ -61,17 +61,24 @@ function AdminEmpresaDetail() {
   }, [id]);
 
   if (loading || loadingBiz) {
-    return <AdminShell title="Empresa"><p className="text-muted-foreground">Carregando...</p></AdminShell>;
+    return (
+      <AdminShell title="Empresa">
+        <p className="text-muted-foreground">Carregando...</p>
+      </AdminShell>
+    );
   }
   if (!biz) {
     return (
       <AdminShell title="Empresa não encontrada">
-        <Link to="/admin/empresas" className="text-brand font-semibold">← Voltar</Link>
+        <Link to="/admin/empresas" className="text-brand font-semibold">
+          ← Voltar
+        </Link>
       </AdminShell>
     );
   }
 
-  const update = (patch: Partial<DBBusiness>) => setBiz((prev) => (prev ? { ...prev, ...patch } : prev));
+  const update = (patch: Partial<DBBusiness>) =>
+    setBiz((prev) => (prev ? { ...prev, ...patch } : prev));
 
   const persist = async (patch: Record<string, unknown>, msg: string) => {
     try {
@@ -84,13 +91,23 @@ function AdminEmpresaDetail() {
 
   const setStatus = async (status: "approved" | "rejected" | "pending") => {
     update({ status });
-    await persist({ status }, status === "approved" ? "Empresa aprovada" : status === "rejected" ? "Rejeitada" : "Marcada como pendente");
+    await persist(
+      { status },
+      status === "approved"
+        ? "Empresa aprovada"
+        : status === "rejected"
+          ? "Rejeitada"
+          : "Marcada como pendente",
+    );
   };
 
   const setTier = async (tier: BusinessTier) => {
     const highlight = tier === "featured" || tier === "premium";
     update({ tier, highlight });
-    await persist({ tier, highlight }, `Plano: ${tier === "premium" ? "Premium" : tier === "featured" ? "Destaque" : "Básico"}`);
+    await persist(
+      { tier, highlight },
+      `Plano: ${tier === "premium" ? "Premium" : tier === "featured" ? "Destaque" : "Básico"}`,
+    );
   };
 
   const saveAll = async () => {
@@ -172,7 +189,9 @@ function AdminEmpresaDetail() {
                   className="input"
                 >
                   {categories.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
                   ))}
                 </select>
               </Field>
@@ -186,7 +205,9 @@ function AdminEmpresaDetail() {
                   className="input"
                 >
                   {neighborhoods.map((n) => (
-                    <option key={n.id} value={n.id}>{n.name}</option>
+                    <option key={n.id} value={n.id}>
+                      {n.name}
+                    </option>
                   ))}
                 </select>
               </Field>
@@ -239,7 +260,9 @@ function AdminEmpresaDetail() {
                 onResolved={(c) => update({ latitude: c.lat, longitude: c.lng })}
                 onPick={(c) => update({ latitude: c.lat, longitude: c.lng })}
               />
-              <p className="text-xs text-muted-foreground mt-1">Clique no mapa ou arraste o pino para ajustar. Salve para confirmar.</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Clique no mapa ou arraste o pino para ajustar. Salve para confirmar.
+              </p>
             </div>
             <div className="grid grid-cols-2 gap-3 mt-3">
               <Field label="Latitude">
@@ -247,7 +270,9 @@ function AdminEmpresaDetail() {
                   type="number"
                   step="any"
                   value={biz.latitude ?? ""}
-                  onChange={(e) => update({ latitude: e.target.value === "" ? null : Number(e.target.value) })}
+                  onChange={(e) =>
+                    update({ latitude: e.target.value === "" ? null : Number(e.target.value) })
+                  }
                   className="input"
                 />
               </Field>
@@ -256,7 +281,9 @@ function AdminEmpresaDetail() {
                   type="number"
                   step="any"
                   value={biz.longitude ?? ""}
-                  onChange={(e) => update({ longitude: e.target.value === "" ? null : Number(e.target.value) })}
+                  onChange={(e) =>
+                    update({ longitude: e.target.value === "" ? null : Number(e.target.value) })
+                  }
                   className="input"
                 />
               </Field>
@@ -284,9 +311,27 @@ function AdminEmpresaDetail() {
         <div className="space-y-4 sm:space-y-6">
           <Card title="Status do cadastro">
             <div className="grid grid-cols-3 gap-2">
-              <ActionBtn active={biz.status === "approved"} onClick={() => setStatus("approved")} icon={Check} label="Aprovar" activeClass="bg-green-500 text-white" />
-              <ActionBtn active={biz.status === "pending"} onClick={() => setStatus("pending")} icon={Clock} label="Pendente" activeClass="bg-orange-500 text-white" />
-              <ActionBtn active={biz.status === "rejected"} onClick={() => setStatus("rejected")} icon={X} label="Rejeitar" activeClass="bg-red-500 text-white" />
+              <ActionBtn
+                active={biz.status === "approved"}
+                onClick={() => setStatus("approved")}
+                icon={Check}
+                label="Aprovar"
+                activeClass="bg-green-500 text-white"
+              />
+              <ActionBtn
+                active={biz.status === "pending"}
+                onClick={() => setStatus("pending")}
+                icon={Clock}
+                label="Pendente"
+                activeClass="bg-orange-500 text-white"
+              />
+              <ActionBtn
+                active={biz.status === "rejected"}
+                onClick={() => setStatus("rejected")}
+                icon={X}
+                label="Rejeitar"
+                activeClass="bg-red-500 text-white"
+              />
             </div>
           </Card>
 
@@ -320,13 +365,21 @@ function AdminEmpresaDetail() {
 
           <Card title="Pré-visualização">
             {biz.image_url && (
-              <img src={biz.image_url} alt={biz.name} className="w-full h-32 object-cover rounded-lg" />
+              <img
+                src={biz.image_url}
+                alt={biz.name}
+                className="w-full h-32 object-cover rounded-lg"
+              />
             )}
             <p className="font-display font-semibold mt-3">{biz.name}</p>
             <p className="text-xs text-muted-foreground">{biz.category}</p>
             <div className="mt-2 space-y-1 text-sm text-muted-foreground">
-              <p className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" /> {biz.neighborhood}</p>
-              <p className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> {biz.whatsapp}</p>
+              <p className="flex items-center gap-1.5">
+                <MapPin className="h-3.5 w-3.5" /> {biz.neighborhood}
+              </p>
+              <p className="flex items-center gap-1.5">
+                <Phone className="h-3.5 w-3.5" /> {biz.whatsapp}
+              </p>
             </div>
             <Link
               to="/negocio/$id"
@@ -353,7 +406,15 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
   );
 }
 
-function Field({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
+function Field({
+  label,
+  children,
+  className = "",
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <label className={`block ${className}`}>
       <span className="text-xs font-medium text-muted-foreground">{label}</span>
@@ -363,13 +424,25 @@ function Field({ label, children, className = "" }: { label: string; children: R
 }
 
 function ActionBtn({
-  active, onClick, icon: Icon, label, activeClass,
-}: { active: boolean; onClick: () => void; icon: React.ComponentType<{ className?: string }>; label: string; activeClass: string }) {
+  active,
+  onClick,
+  icon: Icon,
+  label,
+  activeClass,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  activeClass: string;
+}) {
   return (
     <button
       onClick={onClick}
       className={`h-10 rounded-lg text-xs font-semibold inline-flex items-center justify-center gap-1 border transition ${
-        active ? `${activeClass} border-transparent` : "bg-card border-border text-muted-foreground hover:bg-muted"
+        active
+          ? `${activeClass} border-transparent`
+          : "bg-card border-border text-muted-foreground hover:bg-muted"
       }`}
     >
       <Icon className="h-3.5 w-3.5" /> {label}
@@ -378,8 +451,20 @@ function ActionBtn({
 }
 
 function TierOption({
-  active, onClick, title, desc, icon: Icon, accent = "text-foreground",
-}: { active: boolean; onClick: () => void; title: string; desc: string; icon: React.ComponentType<{ className?: string }>; accent?: string }) {
+  active,
+  onClick,
+  title,
+  desc,
+  icon: Icon,
+  accent = "text-foreground",
+}: {
+  active: boolean;
+  onClick: () => void;
+  title: string;
+  desc: string;
+  icon: React.ComponentType<{ className?: string }>;
+  accent?: string;
+}) {
   return (
     <button
       onClick={onClick}
@@ -387,7 +472,9 @@ function TierOption({
         active ? "border-brand bg-brand/5" : "border-border hover:bg-muted/50"
       }`}
     >
-      <div className={`h-9 w-9 rounded-lg bg-muted inline-flex items-center justify-center ${accent}`}>
+      <div
+        className={`h-9 w-9 rounded-lg bg-muted inline-flex items-center justify-center ${accent}`}
+      >
         <Icon className="h-4 w-4" />
       </div>
       <div className="flex-1 min-w-0">

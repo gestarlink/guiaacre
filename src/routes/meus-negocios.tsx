@@ -69,11 +69,17 @@ function MyBusinessesPage() {
           <div key={b.id} className="rounded-2xl bg-card border border-border/60 shadow-card p-3">
             <div className="flex gap-3">
               {b.image_url && (
-                <img src={b.image_url} alt={b.name} className="h-20 w-20 rounded-xl object-cover shrink-0" />
+                <img
+                  src={b.image_url}
+                  alt={b.name}
+                  className="h-20 w-20 rounded-xl object-cover shrink-0"
+                />
               )}
               <div className="flex-1 min-w-0">
                 <h3 className="font-display font-semibold truncate">{b.name}</h3>
-                <p className="text-xs text-muted-foreground">{b.category} · {b.neighborhood}</p>
+                <p className="text-xs text-muted-foreground">
+                  {b.category} · {b.neighborhood}
+                </p>
                 <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
                   <StatusPill status={b.status} />
                   {b.status === "approved" && <TierBadge tier={b.tier} />}
@@ -104,13 +110,19 @@ function MyBusinessesPage() {
 
 function StatusPill({ status }: { status: "pending" | "approved" | "rejected" }) {
   const config = {
-    pending: { icon: Clock, text: "Aguardando aprovação", cls: "bg-highlight/40 text-highlight-foreground" },
+    pending: {
+      icon: Clock,
+      text: "Aguardando aprovação",
+      cls: "bg-highlight/40 text-highlight-foreground",
+    },
     approved: { icon: Check, text: "Aprovado", cls: "bg-whatsapp/20 text-whatsapp" },
     rejected: { icon: XIcon, text: "Rejeitado", cls: "bg-destructive/15 text-destructive" },
   }[status];
   const Icon = config.icon;
   return (
-    <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold ${config.cls}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold ${config.cls}`}
+    >
       <Icon className="h-3 w-3" /> {config.text}
     </span>
   );

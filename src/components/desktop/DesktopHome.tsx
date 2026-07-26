@@ -1,5 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { Search, MapPin, ArrowRight, Star, TrendingUp, Sparkles, ShieldCheck, Zap } from "lucide-react";
+import {
+  Search,
+  MapPin,
+  ArrowRight,
+  Star,
+  TrendingUp,
+  Sparkles,
+  ShieldCheck,
+  Zap,
+} from "lucide-react";
 import { categories } from "@/lib/data";
 import { useBusinesses } from "@/hooks/useBusinesses";
 import { useNeighborhoods } from "@/hooks/useNeighborhoods";
@@ -18,9 +27,13 @@ export function DesktopHome() {
     <div>
       {/* HERO */}
       <section className="relative overflow-hidden bg-gradient-to-br from-brand via-brand to-brand/80 text-brand-foreground">
-        <div className="absolute inset-0 opacity-20" style={{
-          backgroundImage: "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(255,255,255,0.2) 0%, transparent 40%)"
-        }} />
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(255,255,255,0.2) 0%, transparent 40%)",
+          }}
+        />
         <div className="relative mx-auto max-w-7xl px-6 py-20 lg:py-28 grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 backdrop-blur text-xs font-medium mb-6">
@@ -34,8 +47,8 @@ export function DesktopHome() {
               </span>
             </h1>
             <p className="mt-6 text-lg opacity-90 leading-relaxed max-w-xl">
-              Restaurantes, lojas, serviços e profissionais perto de você.
-              Encontre, avalie e fale direto pelo WhatsApp.
+              Restaurantes, lojas, serviços e profissionais perto de você. Encontre, avalie e fale
+              direto pelo WhatsApp.
             </p>
 
             <Link
@@ -52,9 +65,15 @@ export function DesktopHome() {
             </Link>
 
             <div className="mt-8 flex flex-wrap gap-6 text-sm">
-              <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4" /> Negócios verificados</div>
-              <div className="flex items-center gap-2"><Zap className="h-4 w-4" /> Contato em 1 clique</div>
-              <div className="flex items-center gap-2"><Star className="h-4 w-4" /> Avaliações reais</div>
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4" /> Negócios verificados
+              </div>
+              <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4" /> Contato em 1 clique
+              </div>
+              <div className="flex items-center gap-2">
+                <Star className="h-4 w-4" /> Avaliações reais
+              </div>
             </div>
           </div>
 
@@ -70,7 +89,11 @@ export function DesktopHome() {
                   } ${i === 1 ? "mt-8" : ""}`}
                 >
                   {n.image_url && (
-                    <img src={n.image_url} alt={n.name} className="h-full w-full object-cover group-hover:scale-110 transition duration-500" />
+                    <img
+                      src={n.image_url}
+                      alt={n.name}
+                      className="h-full w-full object-cover group-hover:scale-110 transition duration-500"
+                    />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   <div className="absolute bottom-0 inset-x-0 p-4 text-white">
@@ -91,7 +114,10 @@ export function DesktopHome() {
             <p className="text-xs uppercase tracking-wider text-brand font-semibold">Categorias</p>
             <h2 className="font-display font-bold text-3xl mt-1">Encontre por categoria</h2>
           </div>
-          <Link to="/buscar" className="text-sm text-brand font-semibold hover:underline inline-flex items-center gap-1">
+          <Link
+            to="/buscar"
+            className="text-sm text-brand font-semibold hover:underline inline-flex items-center gap-1"
+          >
             Ver todas <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -149,7 +175,10 @@ export function DesktopHome() {
               </p>
               <h2 className="font-display font-bold text-3xl mt-1">Mais procurados</h2>
             </div>
-            <Link to="/buscar" className="text-sm text-brand font-semibold hover:underline inline-flex items-center gap-1">
+            <Link
+              to="/buscar"
+              className="text-sm text-brand font-semibold hover:underline inline-flex items-center gap-1"
+            >
               Ver todos <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -171,7 +200,10 @@ export function DesktopHome() {
               </p>
               <h2 className="font-display font-bold text-3xl mt-1">Explore por bairro</h2>
             </div>
-            <Link to="/bairros" className="text-sm text-brand font-semibold hover:underline inline-flex items-center gap-1">
+            <Link
+              to="/bairros"
+              className="text-sm text-brand font-semibold hover:underline inline-flex items-center gap-1"
+            >
               Ver todos <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -184,7 +216,11 @@ export function DesktopHome() {
                 className="relative h-48 rounded-2xl overflow-hidden shadow-card hover:shadow-elevated transition group"
               >
                 {n.image_url && (
-                  <img src={n.image_url} alt={n.name} className="h-full w-full object-cover group-hover:scale-110 transition duration-500" />
+                  <img
+                    src={n.image_url}
+                    alt={n.name}
+                    className="h-full w-full object-cover group-hover:scale-110 transition duration-500"
+                  />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                 <div className="absolute bottom-0 inset-x-0 p-4 text-white">
@@ -219,7 +255,9 @@ export function DesktopHome() {
         <div className="rounded-3xl bg-gradient-to-r from-brand to-brand/80 text-brand-foreground p-10 lg:p-14 flex flex-col lg:flex-row items-center justify-between gap-6 shadow-elevated">
           <div>
             <h3 className="font-display font-bold text-3xl lg:text-4xl">Tem um negócio no Acre?</h3>
-            <p className="mt-3 opacity-90 text-lg">Cadastre grátis e seja encontrado por milhares de clientes.</p>
+            <p className="mt-3 opacity-90 text-lg">
+              Cadastre grátis e seja encontrado por milhares de clientes.
+            </p>
           </div>
           <Link
             to="/cadastrar"
@@ -233,7 +271,13 @@ export function DesktopHome() {
   );
 }
 
-function DesktopBusinessCard({ b, variant }: { b: ReturnType<typeof useBusinesses>["data"][number]; variant?: "premium" }) {
+function DesktopBusinessCard({
+  b,
+  variant,
+}: {
+  b: ReturnType<typeof useBusinesses>["data"][number];
+  variant?: "premium";
+}) {
   const isPremium = variant === "premium" || b.tier === "premium";
   return (
     <Link
@@ -243,7 +287,9 @@ function DesktopBusinessCard({ b, variant }: { b: ReturnType<typeof useBusinesse
         isPremium ? "border-amber-400/60 ring-1 ring-amber-400/30" : "border-border"
       }`}
     >
-      <div className={`relative overflow-hidden ${variant === "premium" ? "h-52" : "h-44"} bg-muted`}>
+      <div
+        className={`relative overflow-hidden ${variant === "premium" ? "h-52" : "h-44"} bg-muted`}
+      >
         {b.image_url ? (
           <img
             src={b.image_url}
@@ -252,14 +298,18 @@ function DesktopBusinessCard({ b, variant }: { b: ReturnType<typeof useBusinesse
             className="h-full w-full object-cover group-hover:scale-110 transition duration-500"
           />
         ) : (
-          <div className="h-full w-full flex items-center justify-center text-muted-foreground text-xs">Sem foto</div>
+          <div className="h-full w-full flex items-center justify-center text-muted-foreground text-xs">
+            Sem foto
+          </div>
         )}
         <div className="absolute top-3 left-3">
           <TierBadge tier={b.tier} />
         </div>
       </div>
       <div className="p-4 space-y-2">
-        <h3 className="font-display font-semibold text-base leading-tight line-clamp-1">{b.name}</h3>
+        <h3 className="font-display font-semibold text-base leading-tight line-clamp-1">
+          {b.name}
+        </h3>
         <p className="text-xs text-muted-foreground">
           {b.category} · {b.neighborhood}
         </p>

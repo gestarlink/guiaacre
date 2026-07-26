@@ -45,10 +45,30 @@ function AdminDashboard() {
   return (
     <AdminShell title="Dashboard" subtitle="Visão geral da plataforma">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <StatCard label="Pendentes" value={stats.pending} icon={Clock} color="bg-orange-500/10 text-orange-600" />
-        <StatCard label="Aprovadas" value={stats.approved} icon={CheckCircle2} color="bg-green-500/10 text-green-600" />
-        <StatCard label="Premium" value={stats.premium} icon={Crown} color="bg-amber-500/10 text-amber-600" />
-        <StatCard label="Destaque" value={stats.featured} icon={Star} color="bg-blue-500/10 text-blue-600" />
+        <StatCard
+          label="Pendentes"
+          value={stats.pending}
+          icon={Clock}
+          color="bg-orange-500/10 text-orange-600"
+        />
+        <StatCard
+          label="Aprovadas"
+          value={stats.approved}
+          icon={CheckCircle2}
+          color="bg-green-500/10 text-green-600"
+        />
+        <StatCard
+          label="Premium"
+          value={stats.premium}
+          icon={Crown}
+          color="bg-amber-500/10 text-amber-600"
+        />
+        <StatCard
+          label="Destaque"
+          value={stats.featured}
+          icon={Star}
+          color="bg-blue-500/10 text-blue-600"
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mt-6">
@@ -104,7 +124,11 @@ function AdminDashboard() {
       <section className="mt-6">
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-display font-semibold text-lg">Aguardando aprovação</h2>
-          <Link to="/admin/empresas" search={{ status: "pending" }} className="text-sm text-brand font-semibold">
+          <Link
+            to="/admin/empresas"
+            search={{ status: "pending" }}
+            className="text-sm text-brand font-semibold"
+          >
             Ver todas →
           </Link>
         </div>
@@ -123,7 +147,11 @@ function AdminDashboard() {
                     className="flex items-center gap-3 p-3 sm:p-4 hover:bg-muted/50 transition"
                   >
                     {b.image_url ? (
-                      <img src={b.image_url} alt={b.name} className="h-12 w-12 rounded-lg object-cover shrink-0" />
+                      <img
+                        src={b.image_url}
+                        alt={b.name}
+                        className="h-12 w-12 rounded-lg object-cover shrink-0"
+                      />
                     ) : (
                       <div className="h-12 w-12 rounded-lg bg-muted shrink-0 inline-flex items-center justify-center">
                         <Store className="h-5 w-5 text-muted-foreground" />

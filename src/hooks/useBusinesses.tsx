@@ -24,7 +24,10 @@ export type DBBusiness = {
   longitude: number | null;
 };
 
-export function useBusinesses(filter?: { status?: "approved" | "pending" | "all"; ownerId?: string }) {
+export function useBusinesses(filter?: {
+  status?: "approved" | "pending" | "all";
+  ownerId?: string;
+}) {
   const [data, setData] = useState<DBBusiness[]>([]);
   const [loading, setLoading] = useState(true);
 

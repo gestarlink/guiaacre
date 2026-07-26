@@ -28,9 +28,7 @@ export function useReviews(businessId: string | undefined) {
     fetchReviews();
   }, [fetchReviews]);
 
-  const avg = reviews.length
-    ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
-    : 0;
+  const avg = reviews.length ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
 
   return { reviews, loading, avg, count: reviews.length, refetch: fetchReviews };
 }

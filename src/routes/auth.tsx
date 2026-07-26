@@ -48,7 +48,9 @@ function AuthPage() {
     try {
       if (mode === "signup") {
         const parsed = signupSchema.parse(form);
-        const result = await doSignUp({ data: { email: parsed.email, password: parsed.password, name: parsed.name } });
+        const result = await doSignUp({
+          data: { email: parsed.email, password: parsed.password, name: parsed.name },
+        });
         toast.success("Conta criada com sucesso!");
         await redirectAfterAuth(result.user.role);
       } else {
@@ -121,9 +123,7 @@ function AuthPage() {
           onClick={() => setMode(mode === "login" ? "signup" : "login")}
           className="w-full text-center text-sm text-muted-foreground py-2"
         >
-          {mode === "login"
-            ? "Ainda não tem conta? Cadastre-se"
-            : "Já tem conta? Entrar"}
+          {mode === "login" ? "Ainda não tem conta? Cadastre-se" : "Já tem conta? Entrar"}
         </button>
       </form>
     </MobileShell>

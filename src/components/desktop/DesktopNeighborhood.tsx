@@ -15,7 +15,9 @@ export function DesktopNeighborhood({ slug }: { slug: string }) {
     return (
       <div className="mx-auto max-w-7xl px-6 py-20 text-center">
         <p className="text-muted-foreground">Bairro não encontrado.</p>
-        <Link to="/bairros" className="text-brand underline mt-3 inline-block">Ver todos os bairros</Link>
+        <Link to="/bairros" className="text-brand underline mt-3 inline-block">
+          Ver todos os bairros
+        </Link>
       </div>
     );
   }
@@ -24,16 +26,28 @@ export function DesktopNeighborhood({ slug }: { slug: string }) {
     <div>
       <div className="relative h-72 bg-muted overflow-hidden">
         {neighborhood.image_url && (
-          <img src={neighborhood.image_url} alt={neighborhood.name} className="h-full w-full object-cover" />
+          <img
+            src={neighborhood.image_url}
+            alt={neighborhood.name}
+            className="h-full w-full object-cover"
+          />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/30" />
         <div className="absolute inset-0 mx-auto max-w-7xl px-6 flex flex-col justify-end pb-10 text-white">
-          <Link to="/bairros" className="inline-flex items-center gap-1 text-sm opacity-90 hover:opacity-100 mb-3">
+          <Link
+            to="/bairros"
+            className="inline-flex items-center gap-1 text-sm opacity-90 hover:opacity-100 mb-3"
+          >
             <ArrowLeft className="h-4 w-4" /> Todos os bairros
           </Link>
-          <p className="text-sm opacity-90 flex items-center gap-1"><MapPin className="h-4 w-4" /> {neighborhood.city}</p>
+          <p className="text-sm opacity-90 flex items-center gap-1">
+            <MapPin className="h-4 w-4" /> {neighborhood.city}
+          </p>
           <h1 className="font-display font-bold text-5xl mt-2">{neighborhood.name}</h1>
-          <p className="mt-2 opacity-90">{list.length} negócio{list.length !== 1 ? "s" : ""} cadastrado{list.length !== 1 ? "s" : ""}</p>
+          <p className="mt-2 opacity-90">
+            {list.length} negócio{list.length !== 1 ? "s" : ""} cadastrado
+            {list.length !== 1 ? "s" : ""}
+          </p>
         </div>
       </div>
 
@@ -53,16 +67,24 @@ export function DesktopNeighborhood({ slug }: { slug: string }) {
               >
                 <div className="relative h-48 bg-muted overflow-hidden">
                   {b.image_url ? (
-                    <img src={b.image_url} alt={b.name} className="h-full w-full object-cover group-hover:scale-110 transition duration-500" />
+                    <img
+                      src={b.image_url}
+                      alt={b.name}
+                      className="h-full w-full object-cover group-hover:scale-110 transition duration-500"
+                    />
                   ) : (
-                    <div className="h-full w-full flex items-center justify-center text-muted-foreground text-xs">Sem foto</div>
+                    <div className="h-full w-full flex items-center justify-center text-muted-foreground text-xs">
+                      Sem foto
+                    </div>
                   )}
                   <div className="absolute top-3 left-3">
                     <TierBadge tier={b.tier} />
                   </div>
                 </div>
                 <div className="p-4 space-y-2">
-                  <h3 className="font-display font-semibold text-base leading-tight line-clamp-1">{b.name}</h3>
+                  <h3 className="font-display font-semibold text-base leading-tight line-clamp-1">
+                    {b.name}
+                  </h3>
                   <p className="text-xs text-muted-foreground">{b.category}</p>
                   <div className="flex items-center justify-between pt-2 border-t border-border">
                     <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">

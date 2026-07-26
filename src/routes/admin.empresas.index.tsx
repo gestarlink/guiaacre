@@ -1,6 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Search, Store, Crown, Star, Clock, CheckCircle2, XCircle, ArrowRight, Plus } from "lucide-react";
+import {
+  Search,
+  Store,
+  Crown,
+  Star,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  ArrowRight,
+  Plus,
+} from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminShell } from "@/components/AdminShell";
 import { useBusinesses } from "@/hooks/useBusinesses";
@@ -11,7 +21,8 @@ export const Route = createFileRoute("/admin/empresas/")({
   head: () => ({ meta: [{ title: "Empresas — Admin GuiaAcre" }] }),
   validateSearch: (search: Record<string, unknown>): { status?: StatusFilter } => {
     const s = search.status;
-    if (s === "pending" || s === "approved" || s === "rejected" || s === "all") return { status: s };
+    if (s === "pending" || s === "approved" || s === "rejected" || s === "all")
+      return { status: s };
     return {};
   },
   component: AdminEmpresasPage,
@@ -30,27 +41,35 @@ function AdminEmpresasPage() {
     if (!loading && user && !isAdmin) navigate({ to: "/" });
   }, [loading, user, isAdmin, navigate]);
 
-  const counts = useMemo(() => ({
-    all: data.length,
-    pending: data.filter((b) => b.status === "pending").length,
-    approved: data.filter((b) => b.status === "approved").length,
-    rejected: data.filter((b) => b.status === "rejected").length,
-  }), [data]);
+  const counts = useMemo(
+    () => ({
+      all: data.length,
+      pending: data.filter((b) => b.status === "pending").length,
+      approved: data.filter((b) => b.status === "approved").length,
+      rejected: data.filter((b) => b.status === "rejected").length,
+    }),
+    [data],
+  );
 
   const list = useMemo(() => {
     const q = query.trim().toLowerCase();
     return data
       .filter((b) => tab === "all" || b.status === tab)
-      .filter((b) =>
-        !q ||
-        b.name.toLowerCase().includes(q) ||
-        b.category.toLowerCase().includes(q) ||
-        b.neighborhood.toLowerCase().includes(q),
+      .filter(
+        (b) =>
+          !q ||
+          b.name.toLowerCase().includes(q) ||
+          b.category.toLowerCase().includes(q) ||
+          b.neighborhood.toLowerCase().includes(q),
       );
   }, [data, tab, query]);
 
   if (loading || !isAdmin) {
-    return <AdminShell title="Empresas"><p className="text-muted-foreground">Carregando...</p></AdminShell>;
+    return (
+      <AdminShell title="Empresas">
+        <p className="text-muted-foreground">Carregando...</p>
+      </AdminShell>
+    );
   }
 
   return (
@@ -116,9 +135,17 @@ function AdminEmpresasPage() {
                 {list.map((b) => (
                   <tr key={b.id} className="hover:bg-muted/30 transition">
                     <td className="px-4 py-3">
-                      <Link to="/admin/empresas/$id" params={{ id: b.id }} className="flex items-center gap-3 min-w-0">
+                      <Link
+                        to="/admin/empresas/$id"
+                        params={{ id: b.id }}
+                        className="flex items-center gap-3 min-w-0"
+                      >
                         {b.image_url ? (
-                          <img src={b.image_url} alt={b.name} className="h-10 w-10 rounded-lg object-cover shrink-0" />
+                          <img
+                            src={b.image_url}
+                            alt={b.name}
+                            className="h-10 w-10 rounded-lg object-cover shrink-0"
+                          />
                         ) : (
                           <div className="h-10 w-10 rounded-lg bg-muted inline-flex items-center justify-center shrink-0">
                             <Store className="h-4 w-4 text-muted-foreground" />
@@ -129,8 +156,12 @@ function AdminEmpresasPage() {
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{b.category}</td>
                     <td className="px-4 py-3 text-muted-foreground">{b.neighborhood}</td>
-                    <td className="px-4 py-3"><StatusBadge status={b.status} /></td>
-                    <td className="px-4 py-3"><TierBadge tier={b.tier} /></td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={b.status} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <TierBadge tier={b.tier} />
+                    </td>
                     <td className="px-4 py-3 text-right">
                       <Link
                         to="/admin/empresas/$id"
@@ -155,7 +186,11 @@ function AdminEmpresasPage() {
                     className="flex items-center gap-3 p-3 hover:bg-muted/30 transition"
                   >
                     {b.image_url ? (
-                      <img src={b.image_url} alt={b.name} className="h-12 w-12 rounded-lg object-cover shrink-0" />
+                      <img
+                        src={b.image_url}
+                        alt={b.name}
+                        className="h-12 w-12 rounded-lg object-cover shrink-0"
+                      />
                     ) : (
                       <div className="h-12 w-12 rounded-lg bg-muted inline-flex items-center justify-center shrink-0">
                         <Store className="h-5 w-5 text-muted-foreground" />
@@ -184,7 +219,13 @@ function AdminEmpresasPage() {
 }
 
 function labelOf(t: StatusFilter) {
-  return t === "pending" ? "Pendentes" : t === "approved" ? "Aprovadas" : t === "rejected" ? "Rejeitadas" : "Todas";
+  return t === "pending"
+    ? "Pendentes"
+    : t === "approved"
+      ? "Aprovadas"
+      : t === "rejected"
+        ? "Rejeitadas"
+        : "Todas";
 }
 
 function StatusBadge({ status }: { status: "pending" | "approved" | "rejected" }) {
@@ -195,7 +236,9 @@ function StatusBadge({ status }: { status: "pending" | "approved" | "rejected" }
   } as const;
   const { label, icon: Icon, cls } = map[status];
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}
+    >
       <Icon className="h-3 w-3" /> {label}
     </span>
   );

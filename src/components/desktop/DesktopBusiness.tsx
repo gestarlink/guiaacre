@@ -44,13 +44,21 @@ export function DesktopBusiness({ id }: { id: string }) {
     }
   };
 
-  if (loading) return <div className="mx-auto max-w-7xl px-6 py-20 text-center text-muted-foreground">Carregando...</div>;
-  if (!b) return (
-    <div className="mx-auto max-w-7xl px-6 py-20 text-center">
-      <p>Negócio não encontrado.</p>
-      <Link to="/" className="text-brand underline">Voltar à home</Link>
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="mx-auto max-w-7xl px-6 py-20 text-center text-muted-foreground">
+        Carregando...
+      </div>
+    );
+  if (!b)
+    return (
+      <div className="mx-auto max-w-7xl px-6 py-20 text-center">
+        <p>Negócio não encontrado.</p>
+        <Link to="/" className="text-brand underline">
+          Voltar à home
+        </Link>
+      </div>
+    );
 
   const fav = isFav(b.id);
 
@@ -58,19 +66,33 @@ export function DesktopBusiness({ id }: { id: string }) {
     <div>
       {/* Hero */}
       <div className="relative h-[420px] bg-muted overflow-hidden">
-        {b.image_url && <img src={b.image_url} alt={b.name} className="h-full w-full object-cover" />}
+        {b.image_url && (
+          <img src={b.image_url} alt={b.name} className="h-full w-full object-cover" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         <div className="absolute inset-0 mx-auto max-w-7xl px-6 flex flex-col justify-between py-8">
-          <Link to="/" className="inline-flex items-center gap-1 text-sm text-white/90 hover:text-white w-fit">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1 text-sm text-white/90 hover:text-white w-fit"
+          >
             <ArrowLeft className="h-4 w-4" /> Voltar
           </Link>
           <div className="text-white max-w-3xl">
             <TierBadge tier={b.tier} size="md" />
             <h1 className="font-display font-bold text-5xl mt-3">{b.name}</h1>
-            <p className="text-lg opacity-90 mt-2">{b.category} · {b.neighborhood}</p>
+            <p className="text-lg opacity-90 mt-2">
+              {b.category} · {b.neighborhood}
+            </p>
             <div className="mt-4 flex items-center gap-4 text-sm">
-              <span className="flex items-center gap-2"><Stars value={avg} size={18} /> {count > 0 ? `${avg.toFixed(1)} (${count})` : "Sem avaliações"}</span>
-              {b.hours && <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {b.hours}</span>}
+              <span className="flex items-center gap-2">
+                <Stars value={avg} size={18} />{" "}
+                {count > 0 ? `${avg.toFixed(1)} (${count})` : "Sem avaliações"}
+              </span>
+              {b.hours && (
+                <span className="flex items-center gap-1.5">
+                  <Clock className="h-4 w-4" /> {b.hours}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -82,7 +104,9 @@ export function DesktopBusiness({ id }: { id: string }) {
           {b.description && (
             <section className="rounded-2xl bg-card border border-border p-6">
               <h2 className="font-display font-bold text-xl mb-3">Sobre o negócio</h2>
-              <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{b.description}</p>
+              <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                {b.description}
+              </p>
             </section>
           )}
 
@@ -90,7 +114,9 @@ export function DesktopBusiness({ id }: { id: string }) {
             <MapView address={b.address} lat={b.latitude} lng={b.longitude} height="h-72" />
             <div className="p-5 flex items-center justify-between">
               <div className="min-w-0">
-                <p className="font-display font-semibold">{b.address ?? "Endereço não informado"}</p>
+                <p className="font-display font-semibold">
+                  {b.address ?? "Endereço não informado"}
+                </p>
                 <p className="text-sm text-muted-foreground mt-0.5">{b.neighborhood} · Acre</p>
               </div>
               <MapPin className="h-6 w-6 text-brand shrink-0" />
@@ -133,14 +159,20 @@ export function DesktopBusiness({ id }: { id: string }) {
 
             <div className="space-y-3">
               {reviews.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-6">Seja o primeiro a avaliar.</p>
+                <p className="text-sm text-muted-foreground text-center py-6">
+                  Seja o primeiro a avaliar.
+                </p>
               )}
               {reviews.map((r) => (
                 <div key={r.id} className="rounded-xl border border-border p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       {r.author_avatar ? (
-                        <img src={r.author_avatar} alt="" className="h-9 w-9 rounded-full object-cover" />
+                        <img
+                          src={r.author_avatar}
+                          alt=""
+                          className="h-9 w-9 rounded-full object-cover"
+                        />
                       ) : (
                         <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-sm font-semibold">
                           {r.author_name?.[0]?.toUpperCase() ?? "U"}
@@ -148,7 +180,9 @@ export function DesktopBusiness({ id }: { id: string }) {
                       )}
                       <div>
                         <p className="text-sm font-semibold">{r.author_name}</p>
-                        <p className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString("pt-BR")}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(r.created_at).toLocaleDateString("pt-BR")}
+                        </p>
                       </div>
                     </div>
                     <Stars value={r.rating} size={16} />
@@ -183,7 +217,10 @@ export function DesktopBusiness({ id }: { id: string }) {
                 onClick={() => toggle(b.id)}
                 className="flex-1 h-11 rounded-xl border border-border hover:bg-muted text-sm font-semibold inline-flex items-center justify-center gap-2"
               >
-                <Heart className={`h-4 w-4 ${fav ? "text-destructive" : ""}`} fill={fav ? "currentColor" : "none"} />
+                <Heart
+                  className={`h-4 w-4 ${fav ? "text-destructive" : ""}`}
+                  fill={fav ? "currentColor" : "none"}
+                />
                 {fav ? "Salvo" : "Salvar"}
               </button>
               <button

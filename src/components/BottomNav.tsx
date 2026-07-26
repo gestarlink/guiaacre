@@ -28,9 +28,7 @@ export function BottomNav() {
                   }`}
                   strokeWidth={active ? 2.5 : 2}
                 />
-                <span className={active ? "text-brand" : "text-muted-foreground"}>
-                  {label}
-                </span>
+                <span className={active ? "text-brand" : "text-muted-foreground"}>{label}</span>
               </Link>
             </li>
           );

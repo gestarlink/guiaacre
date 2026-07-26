@@ -103,7 +103,10 @@ function AdminNovaEmpresa() {
       title="Nova empresa"
       subtitle="Cadastre uma empresa direto pelo painel"
       actions={
-        <Link to="/admin/empresas" className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium hover:bg-muted">
+        <Link
+          to="/admin/empresas"
+          className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium hover:bg-muted"
+        >
           <ArrowLeft className="h-4 w-4" /> Voltar
         </Link>
       }
@@ -119,7 +122,11 @@ function AdminNovaEmpresa() {
                 className="input"
               />
               {form.image_url && (
-                <img src={form.image_url} alt="" className="mt-2 w-full h-32 object-cover rounded-lg" />
+                <img
+                  src={form.image_url}
+                  alt=""
+                  className="mt-2 w-full h-32 object-cover rounded-lg"
+                />
               )}
             </div>
           </Card>
@@ -127,35 +134,75 @@ function AdminNovaEmpresa() {
           <Card title="Informações">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="Nome">
-                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="input" />
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="input"
+                />
               </Field>
               <Field label="WhatsApp">
-                <input value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} placeholder="55689..." className="input" />
+                <input
+                  value={form.whatsapp}
+                  onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+                  placeholder="55689..."
+                  className="input"
+                />
               </Field>
               <Field label="Categoria">
-                <select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} className="input">
+                <select
+                  value={form.category_id}
+                  onChange={(e) => setForm({ ...form, category_id: e.target.value })}
+                  className="input"
+                >
                   <option value="">Selecione...</option>
-                  {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
                 </select>
               </Field>
               <Field label="Bairro">
-                <select value={form.neighborhood_id} onChange={(e) => setForm({ ...form, neighborhood_id: e.target.value })} className="input">
+                <select
+                  value={form.neighborhood_id}
+                  onChange={(e) => setForm({ ...form, neighborhood_id: e.target.value })}
+                  className="input"
+                >
                   <option value="">Selecione...</option>
-                  {neighborhoods.map((n) => <option key={n.id} value={n.id}>{n.name}</option>)}
+                  {neighborhoods.map((n) => (
+                    <option key={n.id} value={n.id}>
+                      {n.name}
+                    </option>
+                  ))}
                 </select>
               </Field>
               <Field label="Horário" className="sm:col-span-2">
-                <input value={form.hours} onChange={(e) => setForm({ ...form, hours: e.target.value })} placeholder="Seg-Sex 8h-18h" className="input" />
+                <input
+                  value={form.hours}
+                  onChange={(e) => setForm({ ...form, hours: e.target.value })}
+                  placeholder="Seg-Sex 8h-18h"
+                  className="input"
+                />
               </Field>
               <Field label="Descrição" className="sm:col-span-2">
-                <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} className="input resize-none" />
+                <textarea
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  rows={3}
+                  className="input resize-none"
+                />
               </Field>
             </div>
           </Card>
 
           <Card title="Endereço e mapa">
             <Field label="Endereço completo">
-              <input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Rua, número, bairro" className="input" />
+              <input
+                value={form.address}
+                onChange={(e) => setForm({ ...form, address: e.target.value })}
+                placeholder="Rua, número, bairro"
+                className="input"
+              />
             </Field>
             <button
               type="button"
@@ -173,7 +220,9 @@ function AdminNovaEmpresa() {
                 onResolved={(c) => setForm((f) => ({ ...f, latitude: c.lat, longitude: c.lng }))}
                 onPick={(c) => setForm((f) => ({ ...f, latitude: c.lat, longitude: c.lng }))}
               />
-              <p className="text-xs text-muted-foreground mt-1">Clique no mapa ou arraste o pino para ajustar.</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Clique no mapa ou arraste o pino para ajustar.
+              </p>
             </div>
           </Card>
         </div>
@@ -186,7 +235,9 @@ function AdminNovaEmpresa() {
           >
             <Save className="h-4 w-4" /> {saving ? "Salvando..." : "Cadastrar empresa"}
           </button>
-          <p className="text-xs text-muted-foreground">Cadastros pelo painel são aprovados automaticamente.</p>
+          <p className="text-xs text-muted-foreground">
+            Cadastros pelo painel são aprovados automaticamente.
+          </p>
         </div>
       </form>
     </AdminShell>
@@ -196,13 +247,23 @@ function AdminNovaEmpresa() {
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-2xl bg-card border border-border p-4 sm:p-5">
-      <h3 className="font-display font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">{title}</h3>
+      <h3 className="font-display font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">
+        {title}
+      </h3>
       {children}
     </div>
   );
 }
 
-function Field({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
+function Field({
+  label,
+  children,
+  className = "",
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <label className={`block ${className}`}>
       <span className="text-xs font-medium text-muted-foreground">{label}</span>

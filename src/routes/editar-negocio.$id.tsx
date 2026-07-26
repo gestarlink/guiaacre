@@ -162,7 +162,9 @@ function EditBusinessPage() {
 
       <form onSubmit={onSubmit} className="px-4 space-y-3 pb-6">
         <div>
-          <label className="text-xs font-medium text-muted-foreground mb-1 block">URL da foto</label>
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">
+            URL da foto
+          </label>
           <input
             value={form.image_url ?? ""}
             onChange={(e) => setForm({ ...form, image_url: e.target.value || null })}
@@ -175,7 +177,11 @@ function EditBusinessPage() {
           <img src={form.image_url} alt="Preview" className="h-40 w-full object-cover rounded-xl" />
         )}
 
-        <Field placeholder="Nome do Negócio" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
+        <Field
+          placeholder="Nome do Negócio"
+          value={form.name}
+          onChange={(v) => setForm({ ...form, name: v })}
+        />
         <SelectField
           placeholder="Categoria do Negócio"
           value={form.categoryId}

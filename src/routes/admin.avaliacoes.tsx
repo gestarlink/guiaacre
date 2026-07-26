@@ -40,7 +40,7 @@ function AdminAvaliacoesPage() {
   const load = useCallback(async () => {
     setBusy(true);
     try {
-      const reviews = await doList() as Row[];
+      const reviews = (await doList()) as Row[];
       setRows(reviews);
     } catch (err) {
       toast.error((err as Error).message);
@@ -72,7 +72,10 @@ function AdminAvaliacoesPage() {
   }
 
   return (
-    <AdminShell title="Avaliações" subtitle={`${rows.length} avaliações ${busy ? "(carregando...)" : ""}`}>
+    <AdminShell
+      title="Avaliações"
+      subtitle={`${rows.length} avaliações ${busy ? "(carregando...)" : ""}`}
+    >
       <div className="space-y-3">
         {rows.map((r) => (
           <div key={r.id} className="rounded-2xl bg-card border border-border p-4">
@@ -92,7 +95,9 @@ function AdminAvaliacoesPage() {
                       <Star
                         key={i}
                         className={`h-3.5 w-3.5 ${
-                          i < r.rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30"
+                          i < r.rating
+                            ? "fill-amber-400 text-amber-400"
+                            : "text-muted-foreground/30"
                         }`}
                       />
                     ))}
