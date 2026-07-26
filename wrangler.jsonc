@@ -3,7 +3,6 @@
   "name": "guiaacre",
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "@tanstack/react-start/server-entry",
   "pages": {
     "build": {
       "command": "bun run build",
