@@ -47,7 +47,7 @@ export default defineConfig(({ mode, command }) => {
           client: { files: ["**/server/**"], specifiers: ["server-only"] },
         },
       }),
-      ...(command === "build" ? [nitro({ defaultPreset: "cloudflare-module" } as any)] : []),
+      ...(command === "build" ? [nitro({ defaultPreset: "cloudflare-pages" } as any)] : []),
       react(),
     ],
     server: { host: "::", port: 8080 },

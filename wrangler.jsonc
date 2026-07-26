@@ -7,7 +7,7 @@
   "pages": {
     "build": {
       "command": "bun run build",
-      "directory": ".output/public"
+      "directory": "dist"
     }
   },
   "d1_databases": [
