@@ -2,10 +2,10 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, MapPin, Star, Clock, Share2, Heart, Send, Phone } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { getBusiness } from "@/lib/crud.server";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useAuth } from "@/hooks/useAuth";
-import { useReviews, upsertReview } from "@/hooks/useReviews";
+import { useReviews, createReview } from "@/hooks/useReviews";
 import { Stars } from "@/components/Stars";
 import { TierBadge } from "@/components/TierBadge";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
@@ -23,7 +23,7 @@ export function DesktopBusiness({ id }: { id: string }) {
   const [posting, setPosting] = useState(false);
 
   useEffect(() => {
-    supabase.from("businesses").select("*").eq("id", id).maybeSingle().then(({ data }) => {
+    getBusiness({ data: { id } }).then((data) => {
       setB(data as DBBusiness | null);
       setLoading(false);
     });
@@ -32,12 +32,16 @@ export function DesktopBusiness({ id }: { id: string }) {
   const submitReview = async () => {
     if (!user) return toast.error("Faça login para avaliar");
     setPosting(true);
-    const { error } = await upsertReview({ businessId: id, userId: user.id, rating, comment: comment.trim() });
-    setPosting(false);
-    if (error) return toast.error(error.message);
-    toast.success("Avaliação enviada!");
-    setComment("");
-    refetch();
+    try {
+      await createReview({ business_id: id, rating, comment: comment.trim() });
+      toast.success("Avaliação enviada!");
+      setComment("");
+      refetch();
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setPosting(false);
+    }
   };
 
   if (loading) return <div className="mx-auto max-w-7xl px-6 py-20 text-center text-muted-foreground">Carregando...</div>;

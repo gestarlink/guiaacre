@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { Plus, Trash2, Tag, Save, Pencil, X } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useCategories, type DBCategory } from "@/hooks/useCategories";
 import { AdminShell } from "@/components/AdminShell";
+import { createCategory, updateCategory, deleteCategory } from "@/lib/crud.server";
 
 export const Route = createFileRoute("/admin/categorias")({
   head: () => ({ meta: [{ title: "Categorias — Admin GuiaAcre" }] }),
@@ -21,7 +22,7 @@ function slugify(s: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-const emptyForm = { name: "", emoji: "", color: "", icon_url: "", sort_order: 0 };
+const emptyForm = { name: "", emoji: "", icon: "", sort_order: 0 };
 
 function AdminCategoriasPage() {
   const { user, isAdmin, loading } = useAuth();
@@ -31,6 +32,10 @@ function AdminCategoriasPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+
+  const doCreate = useServerFn(createCategory);
+  const doUpdate = useServerFn(updateCategory);
+  const doDelete = useServerFn(deleteCategory);
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) navigate({ to: "/" });
@@ -53,8 +58,7 @@ function AdminCategoriasPage() {
     setForm({
       name: c.name,
       emoji: c.emoji ?? "",
-      color: c.color ?? "",
-      icon_url: c.icon_url ?? "",
+      icon: c.icon_url ?? "",
       sort_order: c.sort_order,
     });
     setShowForm(true);
@@ -63,32 +67,37 @@ function AdminCategoriasPage() {
   const onSave = async () => {
     if (form.name.trim().length < 2) return toast.error("Nome muito curto");
     setSaving(true);
-    const payload = {
-      name: form.name.trim(),
-      emoji: form.emoji.trim() || null,
-      color: form.color.trim() || null,
-      icon_url: form.icon_url.trim() || null,
-      sort_order: Number(form.sort_order) || 0,
-      slug: editing?.slug || slugify(form.name),
-    };
-    const op = editing
-      ? supabase.from("categories").update(payload).eq("id", editing.id)
-      : supabase.from("categories").insert(payload);
-    const { error } = await op;
-    setSaving(false);
-    if (error) return toast.error(error.message);
-    toast.success(editing ? "Categoria atualizada" : "Categoria adicionada");
-    reset();
-    refetch();
+    try {
+      const payload = {
+        name: form.name.trim(),
+        slug: editing?.slug || slugify(form.name),
+        description: form.emoji.trim() || null,
+        icon: form.icon.trim() || null,
+      };
+      if (editing) {
+        await doUpdate({ data: { ...payload, id: Number(editing.id) } });
+        toast.success("Categoria atualizada");
+      } else {
+        await doCreate({ data: payload });
+        toast.success("Categoria adicionada");
+      }
+      reset();
+      refetch();
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const onDelete = async (id: string) => {
     if (!confirm("Excluir esta categoria?")) return;
-    const { error } = await supabase.from("categories").delete().eq("id", id);
-    if (error) toast.error(error.message);
-    else {
+    try {
+      await doDelete({ data: { id: Number(id) } });
       toast.success("Excluída");
       refetch();
+    } catch (err) {
+      toast.error((err as Error).message);
     }
   };
 
@@ -158,23 +167,10 @@ function AdminCategoriasPage() {
               />
             </label>
             <label className="block sm:col-span-2">
-              <span className="text-xs font-medium text-muted-foreground">
-                Cor de fundo (oklch ou hex, opcional)
-              </span>
+              <span className="text-xs font-medium text-muted-foreground">URL do ícone (opcional)</span>
               <input
-                value={form.color}
-                onChange={(e) => setForm({ ...form, color: e.target.value })}
-                placeholder="oklch(0.96 0.04 60)"
-                className="input mt-1"
-              />
-            </label>
-            <label className="block sm:col-span-2">
-              <span className="text-xs font-medium text-muted-foreground">
-                URL do ícone (opcional)
-              </span>
-              <input
-                value={form.icon_url}
-                onChange={(e) => setForm({ ...form, icon_url: e.target.value })}
+                value={form.icon}
+                onChange={(e) => setForm({ ...form, icon: e.target.value })}
                 placeholder="https://..."
                 className="input mt-1"
               />

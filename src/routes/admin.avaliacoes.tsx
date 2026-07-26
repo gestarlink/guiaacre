@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useState } from "react";
 import { Star, Trash2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminShell } from "@/components/AdminShell";
-import { supabase } from "@/integrations/supabase/client";
+import { listReviews, deleteReview } from "@/lib/crud.server";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/avaliacoes")({
@@ -19,8 +20,7 @@ type Row = {
   rating: number;
   comment: string | null;
   created_at: string;
-  business_name?: string;
-  author_name?: string;
+  user_name?: string;
 };
 
 function AdminAvaliacoesPage() {
@@ -29,6 +29,9 @@ function AdminAvaliacoesPage() {
   const [rows, setRows] = useState<Row[]>([]);
   const [busy, setBusy] = useState(false);
 
+  const doList = useServerFn(listReviews);
+  const doDelete = useServerFn(deleteReview);
+
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
     if (!loading && user && !isAdmin) navigate({ to: "/" });
@@ -36,27 +39,12 @@ function AdminAvaliacoesPage() {
 
   const load = useCallback(async () => {
     setBusy(true);
-    const { data: reviews } = await supabase
-      .from("reviews")
-      .select("id, business_id, user_id, rating, comment, created_at")
-      .order("created_at", { ascending: false })
-      .limit(200);
-    const list = (reviews ?? []) as Row[];
-    if (list.length) {
-      const bIds = [...new Set(list.map((r) => r.business_id))];
-      const uIds = [...new Set(list.map((r) => r.user_id))];
-      const [{ data: businesses }, { data: profiles }] = await Promise.all([
-        supabase.from("businesses").select("id, name").in("id", bIds),
-        supabase.from("profiles").select("user_id, display_name").in("user_id", uIds),
-      ]);
-      const bMap = new Map((businesses ?? []).map((b) => [b.id, b.name]));
-      const pMap = new Map((profiles ?? []).map((p) => [p.user_id, p.display_name]));
-      list.forEach((r) => {
-        r.business_name = bMap.get(r.business_id) ?? "—";
-        r.author_name = pMap.get(r.user_id) ?? "Usuário";
-      });
+    try {
+      const reviews = await doList() as Row[];
+      setRows(reviews);
+    } catch (err) {
+      toast.error((err as Error).message);
     }
-    setRows(list);
     setBusy(false);
   }, []);
 
@@ -66,10 +54,13 @@ function AdminAvaliacoesPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Excluir esta avaliação?")) return;
-    const { error } = await supabase.from("reviews").delete().eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success("Avaliação excluída");
-    setRows((prev) => prev.filter((r) => r.id !== id));
+    try {
+      await doDelete({ data: { id } });
+      toast.success("Avaliação excluída");
+      setRows((prev) => prev.filter((r) => r.id !== id));
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
   };
 
   if (loading || !isAdmin) {
@@ -93,7 +84,7 @@ function AdminAvaliacoesPage() {
                     params={{ id: r.business_id }}
                     className="font-display font-semibold hover:text-brand truncate inline-flex items-center gap-1"
                   >
-                    {r.business_name}
+                    {r.business_id}
                     <ExternalLink className="h-3 w-3" />
                   </Link>
                   <div className="flex items-center gap-0.5">
@@ -108,7 +99,7 @@ function AdminAvaliacoesPage() {
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  por {r.author_name} · {new Date(r.created_at).toLocaleString("pt-BR")}
+                  por {r.user_name ?? "Usuário"} · {new Date(r.created_at).toLocaleString("pt-BR")}
                 </p>
                 {r.comment && (
                   <p className="text-sm mt-2 text-foreground/80 whitespace-pre-wrap">{r.comment}</p>

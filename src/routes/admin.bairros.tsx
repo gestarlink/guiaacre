@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { Plus, Trash2, MapPinned, Save, Pencil, X } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNeighborhoods, type DBNeighborhood } from "@/hooks/useNeighborhoods";
 import { AdminShell } from "@/components/AdminShell";
+import { createNeighborhood, updateNeighborhood, deleteNeighborhood } from "@/lib/crud.server";
 
 export const Route = createFileRoute("/admin/bairros")({
   head: () => ({ meta: [{ title: "Bairros — Admin GuiaAcre" }] }),
@@ -29,6 +30,10 @@ function AdminBairrosPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: "", city: "Rio Branco", image_url: "" });
   const [saving, setSaving] = useState(false);
+
+  const doCreate = useServerFn(createNeighborhood);
+  const doUpdate = useServerFn(updateNeighborhood);
+  const doDelete = useServerFn(deleteNeighborhood);
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) navigate({ to: "/" });
@@ -55,28 +60,37 @@ function AdminBairrosPage() {
   const onSave = async () => {
     if (form.name.trim().length < 2) return toast.error("Nome muito curto");
     setSaving(true);
-    const payload = {
-      name: form.name.trim(),
-      city: form.city.trim() || "Rio Branco",
-      image_url: form.image_url.trim() || null,
-      slug: editing?.slug || slugify(form.name),
-    };
-    const op = editing
-      ? supabase.from("neighborhoods").update(payload).eq("id", editing.id)
-      : supabase.from("neighborhoods").insert(payload);
-    const { error } = await op;
-    setSaving(false);
-    if (error) return toast.error(error.message);
-    toast.success(editing ? "Bairro atualizado" : "Bairro adicionado");
-    reset();
-    refetch();
+    try {
+      const payload = {
+        name: form.name.trim(),
+        slug: editing?.slug || slugify(form.name),
+        city_id: 1,
+      };
+      if (editing) {
+        await doUpdate({ data: { ...payload, id: Number(editing.id) } });
+        toast.success("Bairro atualizado");
+      } else {
+        await doCreate({ data: payload });
+        toast.success("Bairro adicionado");
+      }
+      reset();
+      refetch();
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const onDelete = async (id: string) => {
     if (!confirm("Excluir este bairro?")) return;
-    const { error } = await supabase.from("neighborhoods").delete().eq("id", id);
-    if (error) toast.error(error.message);
-    else { toast.success("Excluído"); refetch(); }
+    try {
+      await doDelete({ data: { id: Number(id) } });
+      toast.success("Excluído");
+      refetch();
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
   };
 
   return (

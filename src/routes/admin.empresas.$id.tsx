@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -15,13 +16,12 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminShell } from "@/components/AdminShell";
+import { getBusiness, updateBusiness, deleteBusiness } from "@/lib/crud.server";
 import type { DBBusiness, BusinessTier } from "@/hooks/useBusinesses";
 import { useNeighborhoods } from "@/hooks/useNeighborhoods";
 import { categories } from "@/lib/data";
-import { PhotoUpload } from "@/components/PhotoUpload";
 import { MapView } from "@/components/MapView";
 
 export const Route = createFileRoute("/admin/empresas/$id")({
@@ -38,6 +38,10 @@ function AdminEmpresaDetail() {
   const [loadingBiz, setLoadingBiz] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  const doGet = useServerFn(getBusiness);
+  const doUpdate = useServerFn(updateBusiness);
+  const doDelete = useServerFn(deleteBusiness);
+
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
     if (!loading && user && !isAdmin) navigate({ to: "/" });
@@ -46,9 +50,12 @@ function AdminEmpresaDetail() {
   useEffect(() => {
     void (async () => {
       setLoadingBiz(true);
-      const { data, error } = await supabase.from("businesses").select("*").eq("id", id).maybeSingle();
-      if (error) toast.error(error.message);
-      setBiz((data as DBBusiness) ?? null);
+      try {
+        const data = await doGet({ data: { id } });
+        setBiz((data as DBBusiness) ?? null);
+      } catch (err) {
+        toast.error((err as Error).message);
+      }
       setLoadingBiz(false);
     })();
   }, [id]);
@@ -66,10 +73,13 @@ function AdminEmpresaDetail() {
 
   const update = (patch: Partial<DBBusiness>) => setBiz((prev) => (prev ? { ...prev, ...patch } : prev));
 
-  const persist = async (patch: Partial<DBBusiness>, msg: string) => {
-    const { error } = await supabase.from("businesses").update(patch).eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success(msg);
+  const persist = async (patch: Record<string, unknown>, msg: string) => {
+    try {
+      await doUpdate({ data: { id, ...patch } });
+      toast.success(msg);
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
   };
 
   const setStatus = async (status: "approved" | "rejected" | "pending") => {
@@ -99,18 +109,25 @@ function AdminEmpresaDetail() {
       latitude: biz.latitude,
       longitude: biz.longitude,
     };
-    const { error } = await supabase.from("businesses").update(payload).eq("id", id);
-    setSaving(false);
-    if (error) toast.error(error.message);
-    else toast.success("Alterações salvas");
+    try {
+      await doUpdate({ data: { id, ...payload } });
+      toast.success("Alterações salvas");
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const remove = async () => {
     if (!confirm("Excluir esta empresa? Esta ação não pode ser desfeita.")) return;
-    const { error } = await supabase.from("businesses").delete().eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success("Empresa excluída");
-    navigate({ to: "/admin/empresas" });
+    try {
+      await doDelete({ data: { id } });
+      toast.success("Empresa excluída");
+      navigate({ to: "/admin/empresas" });
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
   };
 
   return (
@@ -189,14 +206,16 @@ function AdminEmpresaDetail() {
                   className="input resize-none"
                 />
               </Field>
-              <Field label="Foto principal" className="sm:col-span-2">
-                <PhotoUpload
-                  value={biz.image_url}
-                  onChange={(url) => {
+              <Field label="URL da foto" className="sm:col-span-2">
+                <input
+                  value={biz.image_url ?? ""}
+                  onChange={(e) => {
+                    const url = e.target.value || null;
                     update({ image_url: url });
                     void persist({ image_url: url }, "Foto atualizada");
                   }}
-                  folder={biz.owner_id}
+                  placeholder="https://..."
+                  className="input"
                 />
               </Field>
             </div>

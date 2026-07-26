@@ -1,14 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { listNeighborhoods } from "@/lib/crud.server";
+import type { Neighborhood } from "@/lib/types";
 
-export type DBNeighborhood = {
-  id: string;
-  slug: string;
-  name: string;
-  city: string;
-  image_url: string | null;
-  created_at: string;
-};
+export type DBNeighborhood = Neighborhood;
 
 export function useNeighborhoods() {
   const [data, setData] = useState<DBNeighborhood[]>([]);
@@ -16,10 +10,7 @@ export function useNeighborhoods() {
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
-    const { data: rows } = await supabase
-      .from("neighborhoods")
-      .select("*")
-      .order("name", { ascending: true });
+    const rows = await listNeighborhoods();
     setData((rows as DBNeighborhood[]) ?? []);
     setLoading(false);
   }, []);

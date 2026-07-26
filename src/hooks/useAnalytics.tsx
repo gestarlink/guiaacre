@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { createAnalyticsEvent } from "@/lib/crud.server";
 
 export type AnalyticsEvent =
   | "page_view"
@@ -34,18 +34,20 @@ export function useAnalytics() {
       data?: { business_id?: string; metadata?: Record<string, unknown> },
     ) => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        await supabase.from("analytics_events").insert([{
-          event_type,
-          business_id: data?.business_id ?? null,
-          path: typeof window !== "undefined" ? window.location.pathname : null,
-          referrer: typeof document !== "undefined" ? document.referrer || null : null,
-          device_type: deviceType(),
-          user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
-          session_id: getSessionId(),
-          user_id: user?.id ?? null,
-          metadata: (data?.metadata ?? null) as never,
-        }]);
+        await createAnalyticsEvent({
+          data: {
+            event: event_type,
+            business_id: data?.business_id ?? null,
+            metadata: JSON.stringify({
+              session_id: getSessionId(),
+              path: typeof window !== "undefined" ? window.location.pathname : null,
+              referrer: typeof document !== "undefined" ? document.referrer || null : null,
+              device_type: deviceType(),
+              user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
+              ...(data?.metadata ?? {}),
+            }),
+          },
+        });
       } catch {
         // silent
       }

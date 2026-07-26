@@ -9,5 +9,12 @@
       "command": "bun run build",
       "directory": ".output/public"
     }
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "guiaacre-db",
+      "database_id": "a9140841-40b6-494e-9c05-a15b9661558a"
+    }
+  ]
 }

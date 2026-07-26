@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Camera, Save, ChevronDown, MapPin } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowLeft, Save, ChevronDown, MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -7,7 +8,7 @@ import { MobileShell } from "@/components/MobileShell";
 import { categories } from "@/lib/data";
 import { useAuth } from "@/hooks/useAuth";
 import { useNeighborhoods } from "@/hooks/useNeighborhoods";
-import { supabase } from "@/integrations/supabase/client";
+import { getBusiness, updateBusiness } from "@/lib/crud.server";
 
 export const Route = createFileRoute("/editar-negocio/$id")({
   head: () => ({ meta: [{ title: "Editar negócio — GuiaAcre" }] }),
@@ -29,8 +30,6 @@ function EditBusinessPage() {
   const navigate = useNavigate();
   const { user, isAdmin, loading } = useAuth();
   const { data: neighborhoods } = useNeighborhoods();
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = useState(false);
@@ -44,40 +43,40 @@ function EditBusinessPage() {
     address: "",
     description: "",
     hours: "",
+    image_url: null as string | null,
   });
+
+  const doGet = useServerFn(getBusiness);
+  const doUpdate = useServerFn(updateBusiness);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
   }, [loading, user, navigate]);
 
   useEffect(() => {
-    supabase
-      .from("businesses")
-      .select("*")
-      .eq("id", id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (!data) {
-          toast.error("Negócio não encontrado");
-          navigate({ to: "/meus-negocios" });
-          return;
-        }
-        setOwnerId(data.owner_id);
-        setForm({
-          name: data.name,
-          categoryId: data.category_id,
-          neighborhoodId: data.neighborhood_id ?? "",
-          whatsapp: data.whatsapp ?? "",
-          address: data.address ?? "",
-          description: data.description ?? "",
-          hours: data.hours ?? "",
-        });
-        if (data.image_url) setPhotoPreview(data.image_url);
-        if (data.latitude != null && data.longitude != null) {
-          setCoords({ lat: data.latitude, lng: data.longitude });
-        }
-        setLoadingData(false);
+    (async () => {
+      const data = await doGet({ data: { id } });
+      if (!data) {
+        toast.error("Negócio não encontrado");
+        navigate({ to: "/meus-negocios" });
+        return;
+      }
+      setOwnerId(data.owner_id);
+      setForm({
+        name: data.name,
+        categoryId: data.category_id,
+        neighborhoodId: data.neighborhood_id ?? "",
+        whatsapp: data.whatsapp ?? "",
+        address: data.address ?? "",
+        description: data.description ?? "",
+        hours: data.hours ?? "",
+        image_url: data.image_url ?? null,
       });
+      if (data.latitude != null && data.longitude != null) {
+        setCoords({ lat: data.latitude, lng: data.longitude });
+      }
+      setLoadingData(false);
+    })();
   }, [id, navigate]);
 
   useEffect(() => {
@@ -107,14 +106,6 @@ function EditBusinessPage() {
     );
   };
 
-  const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (f) {
-      setPhotoFile(f);
-      setPhotoPreview(URL.createObjectURL(f));
-    }
-  };
-
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -125,20 +116,9 @@ function EditBusinessPage() {
       const nb = neighborhoods.find((n) => n.slug === parsed.neighborhoodId);
       if (!nb) throw new Error("Bairro inválido");
 
-      let imageUrl: string | undefined;
-      if (photoFile) {
-        const ext = photoFile.name.split(".").pop() ?? "jpg";
-        const path = `${user.id}/${Date.now()}.${ext}`;
-        const { error: upErr } = await supabase.storage
-          .from("business-photos")
-          .upload(path, photoFile, { upsert: false });
-        if (upErr) throw upErr;
-        imageUrl = supabase.storage.from("business-photos").getPublicUrl(path).data.publicUrl;
-      }
-
-      const { error } = await supabase
-        .from("businesses")
-        .update({
+      await doUpdate({
+        data: {
+          id,
           name: parsed.name,
           category: cat.name,
           category_id: cat.id,
@@ -150,10 +130,9 @@ function EditBusinessPage() {
           hours: parsed.hours || null,
           latitude: coords?.lat ?? null,
           longitude: coords?.lng ?? null,
-          ...(imageUrl ? { image_url: imageUrl } : {}),
-        })
-        .eq("id", id);
-      if (error) throw error;
+          image_url: form.image_url,
+        },
+      });
       toast.success("Negócio atualizado!");
       navigate({ to: isAdmin && ownerId !== user.id ? "/admin" : "/meus-negocios" });
     } catch (err) {
@@ -182,16 +161,18 @@ function EditBusinessPage() {
       </header>
 
       <form onSubmit={onSubmit} className="px-4 space-y-3 pb-6">
-        <label className="w-full rounded-xl bg-card border border-border px-3 py-3 flex items-center gap-2 cursor-pointer">
-          <Camera className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground truncate flex-1">
-            {photoFile ? photoFile.name : "Trocar foto do negócio"}
-          </span>
-          <input type="file" accept="image/*" capture="environment" hidden onChange={onFile} />
-        </label>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">URL da foto</label>
+          <input
+            value={form.image_url ?? ""}
+            onChange={(e) => setForm({ ...form, image_url: e.target.value || null })}
+            placeholder="https://..."
+            className="w-full rounded-xl bg-card border border-border px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand/40"
+          />
+        </div>
 
-        {photoPreview && (
-          <img src={photoPreview} alt="Preview" className="h-40 w-full object-cover rounded-xl" />
+        {form.image_url && (
+          <img src={form.image_url} alt="Preview" className="h-40 w-full object-cover rounded-xl" />
         )}
 
         <Field placeholder="Nome do Negócio" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />

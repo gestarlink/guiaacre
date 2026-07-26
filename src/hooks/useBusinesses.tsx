@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { listBusinesses } from "@/lib/crud.server";
 
 export type BusinessTier = "basic" | "featured" | "premium";
 
@@ -30,11 +30,7 @@ export function useBusinesses(filter?: { status?: "approved" | "pending" | "all"
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
-    let query = supabase.from("businesses").select("*").order("created_at", { ascending: false });
-    if (filter?.ownerId) query = query.eq("owner_id", filter.ownerId);
-    if (filter?.status && filter.status !== "all") query = query.eq("status", filter.status);
-    else if (!filter?.ownerId && !filter?.status) query = query.eq("status", "approved");
-    const { data: rows } = await query;
+    const rows = await listBusinesses({ data: filter });
     setData((rows as DBBusiness[]) ?? []);
     setLoading(false);
   }, [filter?.status, filter?.ownerId]);

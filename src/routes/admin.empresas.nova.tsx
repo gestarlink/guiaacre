@@ -1,14 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Save, MapPin } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNeighborhoods } from "@/hooks/useNeighborhoods";
 import { categories } from "@/lib/data";
 import { AdminShell } from "@/components/AdminShell";
-import { PhotoUpload } from "@/components/PhotoUpload";
+import { createBusiness } from "@/lib/crud.server";
 import { MapView } from "@/components/MapView";
 
 export const Route = createFileRoute("/admin/empresas/nova")({
@@ -43,6 +43,8 @@ function AdminNovaEmpresa() {
   });
   const [saving, setSaving] = useState(false);
 
+  const doCreate = useServerFn(createBusiness);
+
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) navigate({ to: "/" });
   }, [loading, user, isAdmin, navigate]);
@@ -69,23 +71,23 @@ function AdminNovaEmpresa() {
       const nb = neighborhoods.find((n) => n.id === parsed.neighborhood_id);
       if (!nb) throw new Error("Bairro inválido");
 
-      const { error } = await supabase.from("businesses").insert({
-        owner_id: user.id,
-        name: parsed.name,
-        category: cat.name,
-        category_id: cat.id,
-        neighborhood: nb.name,
-        neighborhood_id: nb.id,
-        whatsapp: parsed.whatsapp.replace(/\D/g, ""),
-        address: parsed.address || null,
-        description: parsed.description || null,
-        hours: form.hours || null,
-        image_url: form.image_url,
-        latitude: form.latitude,
-        longitude: form.longitude,
-        status: "approved",
+      await doCreate({
+        data: {
+          name: parsed.name,
+          category: cat.name,
+          category_id: cat.id,
+          neighborhood: nb.name,
+          neighborhood_id: nb.id,
+          whatsapp: parsed.whatsapp.replace(/\D/g, ""),
+          address: parsed.address || null,
+          description: parsed.description || null,
+          hours: form.hours || null,
+          image_url: form.image_url,
+          latitude: form.latitude,
+          longitude: form.longitude,
+          status: "approved",
+        },
       });
-      if (error) throw error;
       toast.success("Empresa cadastrada!");
       navigate({ to: "/admin/empresas" });
     } catch (err) {
@@ -109,11 +111,17 @@ function AdminNovaEmpresa() {
       <form onSubmit={onSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           <Card title="Foto principal">
-            <PhotoUpload
-              value={form.image_url}
-              onChange={(url) => setForm({ ...form, image_url: url })}
-              folder={user?.id ?? "admin"}
-            />
+            <div>
+              <input
+                value={form.image_url ?? ""}
+                onChange={(e) => setForm({ ...form, image_url: e.target.value || null })}
+                placeholder="https://..."
+                className="input"
+              />
+              {form.image_url && (
+                <img src={form.image_url} alt="" className="mt-2 w-full h-32 object-cover rounded-lg" />
+              )}
+            </div>
           </Card>
 
           <Card title="Informações">

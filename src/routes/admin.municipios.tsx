@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { Plus, Trash2, Building2, Save, Pencil, X } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useCities, type DBCity } from "@/hooks/useCities";
 import { AdminShell } from "@/components/AdminShell";
+import { createCity, updateCity, deleteCity } from "@/lib/crud.server";
 
 export const Route = createFileRoute("/admin/municipios")({
   head: () => ({ meta: [{ title: "Municípios — Admin GuiaAcre" }] }),
@@ -29,6 +30,10 @@ function AdminMunicipiosPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: "", uf: "AC", sort_order: 0 });
   const [saving, setSaving] = useState(false);
+
+  const doCreate = useServerFn(createCity);
+  const doUpdate = useServerFn(updateCity);
+  const doDelete = useServerFn(deleteCity);
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) navigate({ to: "/" });
@@ -55,28 +60,37 @@ function AdminMunicipiosPage() {
   const onSave = async () => {
     if (form.name.trim().length < 2) return toast.error("Nome muito curto");
     setSaving(true);
-    const payload = {
-      name: form.name.trim(),
-      uf: (form.uf.trim() || "AC").toUpperCase().slice(0, 2),
-      sort_order: Number(form.sort_order) || 0,
-      slug: editing?.slug || slugify(form.name),
-    };
-    const op = editing
-      ? supabase.from("cities").update(payload).eq("id", editing.id)
-      : supabase.from("cities").insert(payload);
-    const { error } = await op;
-    setSaving(false);
-    if (error) return toast.error(error.message);
-    toast.success(editing ? "Município atualizado" : "Município adicionado");
-    reset();
-    refetch();
+    try {
+      const payload = {
+        name: form.name.trim(),
+        slug: editing?.slug || slugify(form.name),
+        state: (form.uf.trim() || "AC").toUpperCase().slice(0, 2),
+      };
+      if (editing) {
+        await doUpdate({ data: { ...payload, id: editing.id } });
+        toast.success("Município atualizado");
+      } else {
+        await doCreate({ data: payload });
+        toast.success("Município adicionado");
+      }
+      reset();
+      refetch();
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const onDelete = async (id: string) => {
     if (!confirm("Excluir este município?")) return;
-    const { error } = await supabase.from("cities").delete().eq("id", id);
-    if (error) toast.error(error.message);
-    else { toast.success("Excluído"); refetch(); }
+    try {
+      await doDelete({ data: { id: Number(id) } });
+      toast.success("Excluído");
+      refetch();
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
   };
 
   return (

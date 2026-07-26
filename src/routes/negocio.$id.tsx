@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, MapPin, Star, Clock, Share2, Heart, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -8,11 +9,11 @@ import { DesktopBusiness } from "@/components/desktop/DesktopBusiness";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Stars } from "@/components/Stars";
 import { TierBadge } from "@/components/TierBadge";
-import { supabase } from "@/integrations/supabase/client";
+import { getBusiness, createReview } from "@/lib/crud.server";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useAuth } from "@/hooks/useAuth";
 import { useGeolocation, haversineKm, formatDistance } from "@/hooks/useGeolocation";
-import { useReviews, upsertReview } from "@/hooks/useReviews";
+import { useReviews } from "@/hooks/useReviews";
 import type { DBBusiness } from "@/hooks/useBusinesses";
 import { MapView } from "@/components/MapView";
 
@@ -39,16 +40,15 @@ function BusinessPage() {
   const [comment, setComment] = useState("");
   const [posting, setPosting] = useState(false);
 
+  const doGet = useServerFn(getBusiness);
+  const doCreateReview = useServerFn(createReview);
+
   useEffect(() => {
-    supabase
-      .from("businesses")
-      .select("*")
-      .eq("id", id)
-      .maybeSingle()
-      .then(({ data }) => {
-        setB(data as DBBusiness | null);
-        setLoading(false);
-      });
+    (async () => {
+      const data = await doGet({ data: { id } });
+      setB(data as DBBusiness | null);
+      setLoading(false);
+    })();
   }, [id]);
 
   const distance =
@@ -62,17 +62,22 @@ function BusinessPage() {
       return;
     }
     setPosting(true);
-    const { error } = await upsertReview({
-      businessId: id,
-      userId: user.id,
-      rating,
-      comment: comment.trim(),
-    });
-    setPosting(false);
-    if (error) return toast.error(error.message);
-    toast.success("Avaliação enviada!");
-    setComment("");
-    refetch();
+    try {
+      await doCreateReview({
+        data: {
+          business_id: id,
+          rating,
+          comment: comment.trim() || undefined,
+        },
+      });
+      toast.success("Avaliação enviada!");
+      setComment("");
+      refetch();
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setPosting(false);
+    }
   };
 
   if (loading) {
@@ -126,7 +131,7 @@ function BusinessPage() {
         </DesktopShell>
       </div>
 
-      {/* MOBILE — intacto */}
+      {/* MOBILE */}
       <div className="md:hidden">
         <MobileShell>
           <div className="relative">

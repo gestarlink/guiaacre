@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Save, ChevronDown, MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
@@ -7,8 +8,7 @@ import { MobileShell } from "@/components/MobileShell";
 import { categories } from "@/lib/data";
 import { useAuth } from "@/hooks/useAuth";
 import { useNeighborhoods } from "@/hooks/useNeighborhoods";
-import { supabase } from "@/integrations/supabase/client";
-import { PhotoUpload } from "@/components/PhotoUpload";
+import { createBusiness } from "@/lib/crud.server";
 import { MapView } from "@/components/MapView";
 
 export const Route = createFileRoute("/cadastrar")({
@@ -42,6 +42,8 @@ function AddBusinessPage() {
     description: "",
   });
 
+  const doCreate = useServerFn(createBusiness);
+
   const captureLocation = () => {
     if (!navigator.geolocation) {
       toast.error("Geolocalização não suportada");
@@ -66,7 +68,6 @@ function AddBusinessPage() {
     if (!loading && !user) navigate({ to: "/auth" });
   }, [loading, user, navigate]);
 
-
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -77,22 +78,22 @@ function AddBusinessPage() {
       const nb = neighborhoods.find((n) => n.slug === parsed.neighborhoodId);
       if (!nb) throw new Error("Bairro inválido");
 
-      const { error } = await supabase.from("businesses").insert({
-        owner_id: user.id,
-        name: parsed.name,
-        category: cat.name,
-        category_id: cat.id,
-        neighborhood: nb.name,
-        neighborhood_id: nb.slug,
-        whatsapp: parsed.whatsapp.replace(/\D/g, ""),
-        address: parsed.address || null,
-        description: parsed.description || null,
-        image_url: imageUrl,
-        status: "pending",
-        latitude: coords?.lat ?? null,
-        longitude: coords?.lng ?? null,
+      await doCreate({
+        data: {
+          name: parsed.name,
+          category: cat.name,
+          category_id: cat.id,
+          neighborhood: nb.name,
+          neighborhood_id: nb.slug,
+          whatsapp: parsed.whatsapp.replace(/\D/g, ""),
+          address: parsed.address || null,
+          description: parsed.description || null,
+          image_url: imageUrl,
+          status: "pending",
+          latitude: coords?.lat ?? null,
+          longitude: coords?.lng ?? null,
+        },
       });
-      if (error) throw error;
       toast.success("Cadastro enviado! Aguarde aprovação do admin.");
       navigate({ to: "/meus-negocios" });
     } catch (err) {
@@ -113,11 +114,15 @@ function AddBusinessPage() {
       </header>
 
       <form onSubmit={onSubmit} className="px-4 space-y-3 pb-6">
-        <PhotoUpload
-          value={imageUrl}
-          onChange={setImageUrl}
-          folder={user?.id ?? "anon"}
-        />
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">URL da foto (opcional)</label>
+          <input
+            value={imageUrl ?? ""}
+            onChange={(e) => setImageUrl(e.target.value || null)}
+            placeholder="https://..."
+            className="w-full rounded-xl bg-card border border-border px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand/40"
+          />
+        </div>
 
         <Field
           placeholder="Nome do Negócio"

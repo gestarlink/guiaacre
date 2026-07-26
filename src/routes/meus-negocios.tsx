@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
 import { ArrowLeft, Plus, Clock, Check, X as XIcon, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -6,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useBusinesses } from "@/hooks/useBusinesses";
 import { MobileShell } from "@/components/MobileShell";
 import { TierBadge } from "@/components/TierBadge";
-import { supabase } from "@/integrations/supabase/client";
+import { deleteBusiness } from "@/lib/crud.server";
 
 export const Route = createFileRoute("/meus-negocios")({
   head: () => ({ meta: [{ title: "Meus negócios — GuiaAcre" }] }),
@@ -18,17 +19,20 @@ function MyBusinessesPage() {
   const navigate = useNavigate();
   const { data, refetch } = useBusinesses({ ownerId: user?.id, status: "all" });
 
+  const doDelete = useServerFn(deleteBusiness);
+
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
   }, [loading, user, navigate]);
 
   const onDelete = async (id: string) => {
     if (!confirm("Excluir este negócio? Esta ação não pode ser desfeita.")) return;
-    const { error } = await supabase.from("businesses").delete().eq("id", id);
-    if (error) toast.error(error.message);
-    else {
+    try {
+      await doDelete({ data: { id } });
       toast.success("Negócio excluído");
       refetch();
+    } catch (err) {
+      toast.error((err as Error).message);
     }
   };
 

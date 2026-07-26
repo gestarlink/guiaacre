@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { ArrowLeft, MapPin } from "lucide-react";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
+import { signIn, signUp } from "@/lib/auth.server";
 import { toast } from "sonner";
 import { MobileShell } from "@/components/MobileShell";
 import { useAuth } from "@/hooks/useAuth";
@@ -16,7 +17,6 @@ const signupSchema = z.object({
   email: z.string().trim().email("E-mail inválido").max(255),
   password: z.string().min(6, "Mínimo 6 caracteres").max(72),
   name: z.string().trim().min(2, "Informe seu nome").max(100),
-  phone: z.string().trim().min(8, "Telefone inválido").max(20),
 });
 
 const loginSchema = z.object({
@@ -29,21 +29,17 @@ function AuthPage() {
   const { user, loading: authLoading } = useAuth();
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ email: "", password: "", name: "", phone: "" });
+  const [form, setForm] = useState({ email: "", password: "", name: "" });
 
-  const redirectAfterAuth = async (userId: string) => {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    navigate({ to: data ? "/admin" : "/perfil", replace: true });
+  const doSignIn = useServerFn(signIn);
+  const doSignUp = useServerFn(signUp);
+
+  const redirectAfterAuth = (userRole: string) => {
+    navigate({ to: userRole === "admin" ? "/admin" : "/perfil", replace: true });
   };
 
   useEffect(() => {
-    if (!authLoading && user) redirectAfterAuth(user.id);
-     
+    if (!authLoading && user) redirectAfterAuth(user.role);
   }, [authLoading, user]);
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -52,33 +48,14 @@ function AuthPage() {
     try {
       if (mode === "signup") {
         const parsed = signupSchema.parse(form);
-        const { data, error } = await supabase.auth.signUp({
-          email: parsed.email,
-          password: parsed.password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/`,
-            data: { display_name: parsed.name, phone: parsed.phone },
-          },
-        });
-        if (error) throw error;
-        if (data.session) {
-          toast.success("Conta criada com sucesso!");
-          await redirectAfterAuth(data.session.user.id);
-        } else {
-          toast.success("Conta criada! Confira seu e-mail para confirmar o acesso.");
-          setMode("login");
-          setForm({ email: parsed.email, password: "", name: "", phone: "" });
-        }
+        const result = await doSignUp({ data: { email: parsed.email, password: parsed.password, name: parsed.name } });
+        toast.success("Conta criada com sucesso!");
+        await redirectAfterAuth(result.user.role);
       } else {
         const parsed = loginSchema.parse(form);
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: parsed.email,
-          password: parsed.password,
-        });
-        if (error) throw error;
-        if (!data.session) throw new Error("Não foi possível iniciar sua sessão.");
+        const result = await doSignIn({ data: { email: parsed.email, password: parsed.password } });
         toast.success("Bem-vindo!");
-        await redirectAfterAuth(data.session.user.id);
+        await redirectAfterAuth(result.user.role);
       }
     } catch (err) {
       const msg = err instanceof z.ZodError ? err.errors[0].message : (err as Error).message;
@@ -112,19 +89,11 @@ function AuthPage() {
 
       <form onSubmit={onSubmit} className="px-4 space-y-3">
         {mode === "signup" && (
-          <>
-            <Input
-              placeholder="Seu nome"
-              value={form.name}
-              onChange={(v) => setForm({ ...form, name: v })}
-            />
-            <Input
-              placeholder="WhatsApp (com DDD)"
-              type="tel"
-              value={form.phone}
-              onChange={(v) => setForm({ ...form, phone: v })}
-            />
-          </>
+          <Input
+            placeholder="Seu nome"
+            value={form.name}
+            onChange={(v) => setForm({ ...form, name: v })}
+          />
         )}
         <Input
           placeholder="E-mail"

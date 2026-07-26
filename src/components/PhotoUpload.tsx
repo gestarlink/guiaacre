@@ -1,49 +1,12 @@
-import { useRef, useState } from "react";
-import { Camera, Upload, X, Loader2 } from "lucide-react";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { X } from "lucide-react";
 
 type Props = {
   value: string | null;
   onChange: (url: string | null) => void;
-  /** Folder/prefix inside the bucket (e.g. user.id) */
-  folder: string;
-  bucket?: string;
   className?: string;
 };
 
-/**
- * Upload a photo from device or capture with camera.
- * Uploads to Supabase Storage immediately and returns the public URL.
- */
-export function PhotoUpload({ value, onChange, folder, bucket = "business-photos", className }: Props) {
-  const fileRef = useRef<HTMLInputElement>(null);
-  const cameraRef = useRef<HTMLInputElement>(null);
-  const [uploading, setUploading] = useState(false);
-
-  const handleFile = async (file: File) => {
-    setUploading(true);
-    try {
-      const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-      const path = `${folder}/${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from(bucket).upload(path, file, { upsert: false });
-      if (error) throw error;
-      const { data } = supabase.storage.from(bucket).getPublicUrl(path);
-      onChange(data.publicUrl);
-      toast.success("Foto enviada!");
-    } catch (err) {
-      toast.error((err as Error).message);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const onPick = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (f) void handleFile(f);
-    e.target.value = "";
-  };
-
+export function PhotoUpload({ value, onChange, className }: Props) {
   return (
     <div className={className}>
       {value ? (
@@ -59,29 +22,15 @@ export function PhotoUpload({ value, onChange, folder, bucket = "business-photos
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => cameraRef.current?.click()}
-            disabled={uploading}
-            className="h-24 rounded-xl border-2 border-dashed border-border bg-card flex flex-col items-center justify-center gap-1 text-sm text-muted-foreground hover:bg-muted/50 transition disabled:opacity-60"
-          >
-            {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
-            Tirar foto
-          </button>
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            disabled={uploading}
-            className="h-24 rounded-xl border-2 border-dashed border-border bg-card flex flex-col items-center justify-center gap-1 text-sm text-muted-foreground hover:bg-muted/50 transition disabled:opacity-60"
-          >
-            {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}
-            Galeria
-          </button>
+        <div className="flex items-center gap-2">
+          <input
+            type="url"
+            placeholder="URL da foto..."
+            onChange={(e) => onChange(e.target.value || null)}
+            className="flex-1 h-10 rounded-xl border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40"
+          />
         </div>
       )}
-      <input ref={cameraRef} type="file" accept="image/*" capture="environment" hidden onChange={onPick} />
-      <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPick} />
     </div>
   );
 }

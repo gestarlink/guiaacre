@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Search, Shield, ShieldOff, User as UserIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminShell } from "@/components/AdminShell";
-import { supabase } from "@/integrations/supabase/client";
+import { listUsers, updateUserRole } from "@/lib/crud.server";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -14,12 +15,12 @@ export const Route = createFileRoute("/admin/usuarios")({
 });
 
 type Row = {
-  user_id: string;
-  display_name: string | null;
-  phone: string | null;
+  id: string;
+  email: string;
+  name: string | null;
   avatar_url: string | null;
+  role: string;
   created_at: string;
-  roles: string[];
 };
 
 function AdminUsuariosPage() {
@@ -29,6 +30,9 @@ function AdminUsuariosPage() {
   const [busy, setBusy] = useState(false);
   const [query, setQuery] = useState("");
 
+  const doList = useServerFn(listUsers);
+  const doUpdateRole = useServerFn(updateUserRole);
+
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
     if (!loading && user && !isAdmin) navigate({ to: "/" });
@@ -36,21 +40,8 @@ function AdminUsuariosPage() {
 
   const load = useCallback(async () => {
     setBusy(true);
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("user_id, display_name, phone, avatar_url, created_at")
-      .order("created_at", { ascending: false });
-
-    const { data: roles } = await supabase.from("user_roles").select("user_id, role");
-    const map = new Map<string, string[]>();
-    (roles ?? []).forEach((r) => {
-      const arr = map.get(r.user_id) ?? [];
-      arr.push(r.role);
-      map.set(r.user_id, arr);
-    });
-    setRows(
-      (profiles ?? []).map((p) => ({ ...p, roles: map.get(p.user_id) ?? [] })) as Row[],
-    );
+    const data = await doList();
+    setRows(data as Row[]);
     setBusy(false);
   }, []);
 
@@ -59,27 +50,18 @@ function AdminUsuariosPage() {
   }, [isAdmin, load]);
 
   const toggleAdmin = async (row: Row) => {
-    const has = row.roles.includes("admin");
-    if (has) {
-      if (row.user_id === user?.id) {
-        toast.error("Você não pode remover seu próprio acesso admin");
-        return;
-      }
-      const { error } = await supabase
-        .from("user_roles")
-        .delete()
-        .eq("user_id", row.user_id)
-        .eq("role", "admin");
-      if (error) return toast.error(error.message);
-      toast.success("Acesso admin removido");
-    } else {
-      const { error } = await supabase
-        .from("user_roles")
-        .insert({ user_id: row.user_id, role: "admin" });
-      if (error) return toast.error(error.message);
-      toast.success("Usuário promovido a admin");
+    const newRole = row.role === "admin" ? "user" : "admin";
+    if (newRole !== "admin" && row.id === user?.id) {
+      toast.error("Você não pode remover seu próprio acesso admin");
+      return;
     }
-    load();
+    try {
+      await doUpdateRole({ data: { id: row.id, role: newRole } });
+      toast.success(newRole === "admin" ? "Usuário promovido a admin" : "Acesso admin removido");
+      load();
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
   };
 
   const filtered = useMemo(() => {
@@ -87,9 +69,9 @@ function AdminUsuariosPage() {
     if (!q) return rows;
     return rows.filter(
       (r) =>
-        (r.display_name ?? "").toLowerCase().includes(q) ||
-        (r.phone ?? "").toLowerCase().includes(q) ||
-        r.user_id.toLowerCase().includes(q),
+        (r.name ?? "").toLowerCase().includes(q) ||
+        (r.email ?? "").toLowerCase().includes(q) ||
+        r.id.toLowerCase().includes(q),
     );
   }, [rows, query]);
 
@@ -107,7 +89,7 @@ function AdminUsuariosPage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           className="pl-9"
-          placeholder="Buscar por nome, telefone ou ID..."
+          placeholder="Buscar por nome, email ou ID..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -119,17 +101,17 @@ function AdminUsuariosPage() {
             <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
               <tr>
                 <th className="px-4 py-3 font-medium">Usuário</th>
-                <th className="px-4 py-3 font-medium">Telefone</th>
-                <th className="px-4 py-3 font-medium">Funções</th>
+                <th className="px-4 py-3 font-medium">Email</th>
+                <th className="px-4 py-3 font-medium">Função</th>
                 <th className="px-4 py-3 font-medium">Cadastro</th>
                 <th className="px-4 py-3 font-medium text-right">Ações</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((r) => {
-                const isAdminUser = r.roles.includes("admin");
+                const isAdminUser = r.role === "admin";
                 return (
-                  <tr key={r.user_id} className="border-t border-border">
+                  <tr key={r.id} className="border-t border-border">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         {r.avatar_url ? (
@@ -140,30 +122,22 @@ function AdminUsuariosPage() {
                           </div>
                         )}
                         <div className="min-w-0">
-                          <p className="font-medium truncate">{r.display_name || "Sem nome"}</p>
-                          <p className="text-xs text-muted-foreground truncate">{r.user_id}</p>
+                          <p className="font-medium truncate">{r.name || "Sem nome"}</p>
+                          <p className="text-xs text-muted-foreground truncate">{r.email}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">{r.phone || "—"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{r.email || "—"}</td>
                     <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {r.roles.length === 0 && (
-                          <span className="text-xs text-muted-foreground">user</span>
-                        )}
-                        {r.roles.map((role) => (
-                          <span
-                            key={role}
-                            className={`text-xs px-2 py-0.5 rounded-full ${
-                              role === "admin"
-                                ? "bg-amber-500/15 text-amber-700"
-                                : "bg-muted text-foreground/70"
-                            }`}
-                          >
-                            {role}
-                          </span>
-                        ))}
-                      </div>
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded-full ${
+                          isAdminUser
+                            ? "bg-amber-500/15 text-amber-700"
+                            : "bg-muted text-foreground/70"
+                        }`}
+                      >
+                        {r.role}
+                      </span>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
                       {new Date(r.created_at).toLocaleDateString("pt-BR")}
