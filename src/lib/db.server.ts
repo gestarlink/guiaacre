@@ -7,18 +7,17 @@ export function setDB(db: D1Database) {
 export function getDB(): D1Database {
   if (_db) return _db;
   try {
-    const storage =
-      (globalThis as any)[Symbol.for("tanstack-start:event-storage")];
+    const storage = (globalThis as any)[Symbol.for("tanstack-start:event-storage")];
     const store = storage?.getStore();
     const h3Event = store?.h3Event;
-    const env =
-      (h3Event as any)?.req?.runtime?.cloudflare?.env ??
-      (globalThis as any).__env__;
+    const env = (h3Event as any)?.req?.runtime?.cloudflare?.env ?? (globalThis as any).__env__;
     if (env?.DB) {
       _db = env.DB;
       return _db;
     }
-  } catch {}
+  } catch {
+    // fallback to __env__
+  }
   throw new Error("D1 not available");
 }
 
