@@ -1,24 +1,19 @@
-import { readFileSync, writeFileSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, unlinkSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Fix 1: Clean wrangler.json - remove pages/pages_build_output_dir
+// Fix 1: DELETE _worker.js/wrangler.json — project-level config already
+// has compatibility_flags: ["nodejs_compat"] and d1_databases in [env.production].
+// The generated _worker.js/wrangler.json can override/conflict with that.
 const wranglerPath = join(__dirname, "..", "dist", "_worker.js", "wrangler.json");
-if (!existsSync(wranglerPath)) {
-  console.error(`[fix-wrangler-json] NOT FOUND: ${wranglerPath}`);
-  process.exit(1);
+if (existsSync(wranglerPath)) {
+  unlinkSync(wranglerPath);
+  console.log(`[fix-wrangler-json] Deleted: ${wranglerPath}`);
+} else {
+  console.log(`[fix-wrangler-json] Already absent: ${wranglerPath}`);
 }
-const raw = readFileSync(wranglerPath, "utf-8");
-const config = JSON.parse(raw);
-const clean = {
-  compatibility_date: config.compatibility_date,
-  compatibility_flags: config.compatibility_flags,
-  d1_databases: config.d1_databases,
-};
-writeFileSync(wranglerPath, JSON.stringify(clean, null, 2) + "\n");
-console.log(`[fix-wrangler-json] Fixed: ${wranglerPath}`);
 
 // Fix 2: Patch index.js to set globalThis.__env__ so getDB() can find env.DB directly
 const indexPath = join(__dirname, "..", "dist", "_worker.js", "index.js");
