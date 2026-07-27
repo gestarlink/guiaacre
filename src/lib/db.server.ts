@@ -6,6 +6,17 @@ export function setDB(db: D1Database) {
 
 export function getDB(): D1Database {
   if (_db) return _db;
+
+  // 1) Try process.env (nodejs_compat exposes bindings here in Workers)
+  try {
+    const env = (process as any).env as Record<string, unknown> | undefined;
+    if (env?.DB) {
+      _db = env.DB as D1Database;
+      return _db;
+    }
+  } catch { /* process.env not available */ }
+
+  // 2) Try TanStack Start's event storage (AsyncLocalStorage)
   try {
     const storage = (globalThis as any)[Symbol.for("tanstack-start:event-storage")];
     const store = storage?.getStore();
@@ -15,9 +26,8 @@ export function getDB(): D1Database {
       _db = env.DB;
       return _db;
     }
-  } catch {
-    // fallback to __env__
-  }
+  } catch { /* event storage not available */ }
+
   throw new Error("D1 not available");
 }
 
