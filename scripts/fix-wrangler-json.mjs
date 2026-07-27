@@ -36,3 +36,38 @@ if (indexContent.includes(target)) {
   console.error(`[fix] Could not find target in index.js`);
   process.exit(1);
 }
+
+// Fix 3: Patch _ssr/index.mjs createServerFn — add .validator() alias for .inputValidator()
+// (Nitro generates .validator() calls but the bundled createServerFn only has .inputValidator())
+const ssrIndexPath = join(__dirname, "..", "dist", "_worker.js", "_ssr", "index.mjs");
+if (!existsSync(ssrIndexPath)) {
+  console.error(`[fix] NOT FOUND: ${ssrIndexPath}`);
+  process.exit(1);
+}
+let ssrIndexContent = readFileSync(ssrIndexPath, "utf-8");
+const vOld = `    inputValidator: (inputValidator) => {
+      return createServerFn(void 0, {
+        ...resolvedOptions,
+        inputValidator
+      });
+    },`;
+const vNew = `    validator: (inputValidator) => {
+      return createServerFn(void 0, {
+        ...resolvedOptions,
+        inputValidator
+      });
+    },
+    inputValidator: (inputValidator) => {
+      return createServerFn(void 0, {
+        ...resolvedOptions,
+        inputValidator
+      });
+    },`;
+if (ssrIndexContent.includes(vOld)) {
+  ssrIndexContent = ssrIndexContent.replace(vOld, vNew);
+  writeFileSync(ssrIndexPath, ssrIndexContent);
+  console.log(`[fix] Added .validator() alias to createServerFn in ${ssrIndexPath}`);
+} else {
+  console.error(`[fix] Could not find inputValidator in _ssr/index.mjs`);
+  process.exit(1);
+}
