@@ -14,7 +14,9 @@ export function getDB(): D1Database {
       _db = env.DB as D1Database;
       return _db;
     }
-  } catch { /* process.env not available */ }
+  } catch {
+    /* process.env not available */
+  }
 
   // 2) Try TanStack Start's event storage (AsyncLocalStorage)
   try {
@@ -26,7 +28,9 @@ export function getDB(): D1Database {
       _db = env.DB;
       return _db;
     }
-  } catch { /* event storage not available */ }
+  } catch {
+    /* event storage not available */
+  }
 
   throw new Error("D1 not available");
 }
