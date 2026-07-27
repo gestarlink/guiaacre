@@ -13,7 +13,9 @@ export function getDB(): D1Database {
       _db = env.DB;
       return _db;
     }
-  } catch { /* __env__ */ }
+  } catch {
+    /* __env__ */
+  }
 
   try {
     const env = (process as any).env;
@@ -21,7 +23,9 @@ export function getDB(): D1Database {
       _db = env.DB as D1Database;
       return _db;
     }
-  } catch { /* process.env */ }
+  } catch {
+    /* process.env */
+  }
 
   try {
     const storage = (globalThis as any)[Symbol.for("tanstack-start:event-storage")];
@@ -32,7 +36,9 @@ export function getDB(): D1Database {
       _db = env.DB;
       return _db;
     }
-  } catch { /* storage */ }
+  } catch {
+    /* storage */
+  }
 
   // For DIAGNOSTIC: create a mock D1 that always returns empty arrays
   // so we can see if the site loads at all (error is elsewhere)
