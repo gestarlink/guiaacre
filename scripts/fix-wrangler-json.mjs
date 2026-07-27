@@ -1,24 +1,28 @@
-import { readFileSync, writeFileSync, unlinkSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Fix 1: DELETE _worker.js/wrangler.json — project-level config already
-// has compatibility_flags: ["nodejs_compat"] and d1_databases in [env.production].
-// The generated _worker.js/wrangler.json can override/conflict with that.
+// Fix 1: Clean _worker.js/wrangler.json — remove only the "pages" field
+// (which is invalid inside _worker.js/ context). Keep everything else
+// including pages_build_output_dir (valid), compat flags, and D1 bindings.
 const wranglerPath = join(__dirname, "..", "dist", "_worker.js", "wrangler.json");
-if (existsSync(wranglerPath)) {
-  unlinkSync(wranglerPath);
-  console.log(`[fix-wrangler-json] Deleted: ${wranglerPath}`);
-} else {
-  console.log(`[fix-wrangler-json] Already absent: ${wranglerPath}`);
+if (!existsSync(wranglerPath)) {
+  console.error(`[fix] NOT FOUND: ${wranglerPath}`);
+  process.exit(1);
 }
+const raw = readFileSync(wranglerPath, "utf-8");
+const config = JSON.parse(raw);
+delete config.pages;
+// keep $schema, name, pages_build_output_dir — all valid here
+writeFileSync(wranglerPath, JSON.stringify(config, null, 2) + "\n");
+console.log(`[fix] Removed "pages" from ${wranglerPath}`);
 
 // Fix 2: Patch index.js to set globalThis.__env__ so getDB() can find env.DB directly
 const indexPath = join(__dirname, "..", "dist", "_worker.js", "index.js");
 if (!existsSync(indexPath)) {
-  console.error(`[fix-wrangler-json] NOT FOUND: ${indexPath}`);
+  console.error(`[fix] NOT FOUND: ${indexPath}`);
   process.exit(1);
 }
 let indexContent = readFileSync(indexPath, "utf-8");
@@ -27,8 +31,8 @@ const replacement = "async fetch(cfReq, env, context) {\n    globalThis.__env__ 
 if (indexContent.includes(target)) {
   indexContent = indexContent.replace(target, replacement);
   writeFileSync(indexPath, indexContent);
-  console.log(`[fix-wrangler-json] Patched: added globalThis.__env__ to ${indexPath}`);
+  console.log(`[fix] Added globalThis.__env__ to ${indexPath}`);
 } else {
-  console.error(`[fix-wrangler-json] Could not find target in index.js`);
+  console.error(`[fix] Could not find target in index.js`);
   process.exit(1);
 }
